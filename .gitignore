@@ -50,3 +50,7 @@ modules.order
 Module.symvers
 Mkfile.old
 dkms.conf
+.vscode/
+CC2530DB/CHDTECH_DEV/
+CC2530DB/settings/
+CC2530DB/WaterControl.dep
