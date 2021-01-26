@@ -43,9 +43,6 @@ app_config_t zcl_Configs[ENDPOINTS_COUNT] = {
 const cId_t zclEndpoint_InClusterList[]  = { CID_BASIC, CID_GROUPS, CID_ON_OFF };
 const cId_t zclEndpoint_OutClusterList[] = { CID_METERING };
 
-//#define APP_MAX_INCLUSTERS   (sizeof(zclEndpoint_InClusterList) / sizeof(zclEndpoint_InClusterList[0]))
-//#define APP_MAX_OUTCLUSTERS  (sizeof(zclEndpoint_OutClusterList) / sizeof(zclEndpoint_OutClusterList[0]))
-
 CONST zclAttrRec_t zclEndpoints_Attrs[][ENDPOINT_ATTRS_COUNT] = {
   {
     /*                                               ZCL_CLUSTER_ID_GEN_BASIC                                                           */
