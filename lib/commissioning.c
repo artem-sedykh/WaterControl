@@ -14,6 +14,8 @@ extern bool requestNewTrustCenterLinkKey;
 byte rejoinsLeft = APP_COMMISSIONING_END_DEVICE_REJOIN_TRIES;
 uint32 rejoinDelay = APP_COMMISSIONING_END_DEVICE_REJOIN_START_DELAY;
 
+zclCommissioningOnConnectCB_t zcl_Commissioning_OnConnectCB = (zclCommissioningOnConnectCB_t)NULL;
+
 uint8 zclCommissioning_TaskId = 0;
 
 #ifndef APP_TX_POWER
@@ -34,6 +36,10 @@ void zclCommissioning_Init(uint8 task_id) {
     bdb_StartCommissioning(BDB_COMMISSIONING_MODE_NWK_STEERING | BDB_COMMISSIONING_MODE_FINDING_BINDING);
 }
 
+void zclCommissioningRegisterOnConnectCB( zclCommissioningOnConnectCB_t pfnWCommissioningOnConnect ) {
+    zcl_Commissioning_OnConnectCB = pfnWCommissioningOnConnect;
+}
+
 static void zclCommissioning_ResetBackoffRetry(void) {
     rejoinsLeft = APP_COMMISSIONING_END_DEVICE_REJOIN_TRIES;
     rejoinDelay = APP_COMMISSIONING_END_DEVICE_REJOIN_START_DELAY;
@@ -43,6 +49,10 @@ static void zclCommissioning_OnConnect(void) {
     LREPMaster("zclCommissioning_OnConnect \r\n");
     zclCommissioning_ResetBackoffRetry();
     osal_start_timerEx(zclCommissioning_TaskId, APP_COMMISSIONING_CLOCK_DOWN_POLING_RATE_EVT, 10 * 1000);
+
+    if ( zcl_Commissioning_OnConnectCB != NULL ) {
+        zcl_Commissioning_OnConnectCB ();
+    }
 }
 
 static void zclCommissioning_ProcessCommissioningStatus(bdbCommissioningModeMsg_t *bdbCommissioningModeMsg) {

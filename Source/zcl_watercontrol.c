@@ -66,7 +66,8 @@ afAddrType_t inderect_DstAddr = {.addrMode = (afAddrMode_t)AddrNotPresent, .endP
 /*********************************************************************
 * LOCAL FUNCTIONS
 */
-static void      zclWaterControl_InitReportValues  ( void );
+static void      zclWaterControl_PushState         ( void );
+static void      zclCommissioning_OnConnectCB      ( void );
 static void      zclWaterControl_WriteAttrDataCB   ( uint8 endpoint, zclAttrRec_t *pAttr );
 static void      zclWaterControl_SaveAttributes    ( void );
 static void      zclWaterControl_RestoreAttributes ( void );
@@ -110,7 +111,7 @@ static zclGeneral_AppCallbacks_t zclColdEndpoint_CmdCallbacks = {
 
 void zclWaterControl_Init( byte task_id )
 {
-  //HalLedSet(HAL_LED_ALL, HAL_LED_MODE_BLINK);
+  HalLedSet(HAL_LED_ALL, HAL_LED_MODE_BLINK);
   
   zclWaterControl_TaskID = task_id;
 
@@ -133,21 +134,19 @@ void zclWaterControl_Init( byte task_id )
   //--------------------------------------------------------------------------------------------------
   
   zcl_registerWriteAttrDataCB ( zclWaterControl_WriteAttrDataCB );
-  
+
+  zclCommissioningRegisterOnConnectCB ( zclCommissioning_OnConnectCB );
+
   zcl_registerForMsg( zclWaterControl_TaskID );
   
   RegisterForKeys( zclWaterControl_TaskID );
   
   LREP("Build %s \r\n", zclWaterControl_DateCodeNT);
-
-  zclWaterControl_InitReportValues ();
   
   osal_start_reload_timer ( zclWaterControl_TaskID, APP_REPORT_EVT, APP_REPORT_DELAY );
 
   //create loop for save attributes to nv
   osal_start_reload_timer ( zclWaterControl_TaskID, APP_SAVE_ATTRS_EVT, APP_SAVE_ATTRS_DELAY );
-  
-  osal_start_reload_timer ( zclWaterControl_TaskID, APP_TEST_ATTRS_EVT, 60000 );
 }
 
 uint16 zclWaterControl_event_loop( uint8 task_id, uint16 events ) {
@@ -185,12 +184,10 @@ uint16 zclWaterControl_event_loop( uint8 task_id, uint16 events ) {
       return (events ^ APP_SAVE_ATTRS_EVT);
   }
   
-  //TODO: remove it!
-  if (events & APP_TEST_ATTRS_EVT) {
-      //LREPMaster("[event_loop]: received APP_TEST_ATTRS_EVT\r\n");
-      // zclWaterControl_Increment (&zcl_Configs[0]);
-      // zclWaterControl_Increment (&zcl_Configs[1]);
-      return (events ^ APP_TEST_ATTRS_EVT);
+  if (events & APP_PUSH_STATE_EVT) {
+      LREPMaster("[event_loop]: received APP_PUSH_STATE_EVT\r\n");
+      zclWaterControl_PushState ();
+      return (events ^ APP_PUSH_STATE_EVT);
   }
   
   return 0;
@@ -380,14 +377,18 @@ static void zclWaterControl_Report ( void ) {
 
       zcl_Configs[i].ReportCurrentSummDelivered = FALSE;
       
-      LREP ( "[ep%d Report] CurrentSummDelivered \r\n", endpoint );
+      LREP ( "[ep%d Report] CurrentSummDelivered\r\n", endpoint );
     }
   }
   
   osal_mem_free(pReportCmd);
 }
 
-static void zclWaterControl_InitReportValues ( void ) {
+static void zclCommissioning_OnConnectCB ( void ) {
+  osal_start_timerEx(zclWaterControl_TaskID, APP_PUSH_STATE_EVT, 10 * 1000);
+}
+
+static void zclWaterControl_PushState ( void ) {
   uint8 i = 0;
 
   for (i = 0; i < zcl_Configs_AttrsCount; ++i) {
