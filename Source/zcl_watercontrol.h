@@ -18,31 +18,23 @@ extern "C"
 #define ENDPOINT_ATTRS_COUNT  18 
 #define APP_REPORT_DELAY     ((uint32)5 * (uint32)1000) // 5 sec
 #define APP_SAVE_ATTRS_DELAY ((uint32)600 * (uint32)1000) // 10 minute
+
+#define NW_HOT_CONFIG                   0x0402
+#define NW_COLD_CONFIG                  0x0412
+
    
 // Application Events
 #define APP_REPORT_EVT                  0x0001
 #define APP_SAVE_ATTRS_EVT              0x0002
 #define APP_PUSH_STATE_EVT              0x0004
 
-/*********************************************************************
- * MACROS
- */
-#define NW_HOT_CONFIG                   0x0402
-#define NW_COLD_CONFIG                  0x0412
-
-
-#define R                               (ACCESS_CONTROL_READ)
-#define RW                              (R | ACCESS_CONTROL_WRITE | ACCESS_CONTROL_AUTH_WRITE)
-#define RR                              (ACCESS_CONTROL_READ | ACCESS_REPORTABLE)
-#define RRW                             (ACCESS_CONTROL_READ | ACCESS_CONTROL_WRITE | ACCESS_CONTROL_AUTH_WRITE | ACCESS_REPORTABLE)
 
 #define CID_BASIC                       ZCL_CLUSTER_ID_GEN_BASIC
 #define CID_GROUPS                      ZCL_CLUSTER_ID_GEN_GROUPS
 #define CID_ON_OFF                      ZCL_CLUSTER_ID_GEN_ON_OFF
-
-//******************Metering*****************************
+//***************************Metering******************************
 #define CID_METERING                    ZCL_CLUSTER_ID_SE_METERING
-//*****************Attributes****************************
+//***************************Attributes****************************
 #define ATTRID_CURRENT_SUMM_DELIVERED   0x0000
 #define ATTRID_STATUS                   0x0200
 #define ATTRID_UNIT_OF_MEASURE          0x0300
@@ -50,7 +42,7 @@ extern "C"
 #define ATTRID_DIVISOR                  0x0302
 #define ATTRID_SUMM_FORMATTING          0x0303
 #define ATTRID_METERING_DEVICE_TYPE     0x0306
-//*******************************************************  
+//*****************************************************************
 #define ZCL_UINT8                       ZCL_DATATYPE_UINT8
 #define ZCL_UINT16                      ZCL_DATATYPE_UINT16
 #define ZCL_UINT24                      ZCL_DATATYPE_UINT24
@@ -59,6 +51,15 @@ extern "C"
 #define ZCL_ENUM8                       ZCL_DATATYPE_ENUM8
 #define ZCL_BOOLEAN                     ZCL_DATATYPE_BOOLEAN
 #define ZCL_BITMAP8                     ZCL_DATATYPE_BITMAP8
+
+/*********************************************************************
+ * MACROS
+ */
+
+#define R                               (ACCESS_CONTROL_READ)
+#define RW                              (R | ACCESS_CONTROL_WRITE | ACCESS_CONTROL_AUTH_WRITE)
+#define RR                              (ACCESS_CONTROL_READ | ACCESS_REPORTABLE)
+#define RRW                             (ACCESS_CONTROL_READ | ACCESS_CONTROL_WRITE | ACCESS_CONTROL_AUTH_WRITE | ACCESS_REPORTABLE)
 
 /*********************************************************************
  * TYPEDEFS
@@ -121,18 +122,20 @@ typedef struct {
  * VARIABLES
  */
 
-extern const uint8               zcl_Configs_AttrsCount;
+extern const uint8               zcl_EndpointsCount;
 extern app_config_t              zcl_Configs[ENDPOINTS_COUNT];
 
 extern SimpleDescriptionFormat_t zclEndpoints[];
 extern CONST zclAttrRec_t        zclEndpoints_Attrs[][ENDPOINT_ATTRS_COUNT];
 extern const uint8               zclEndpoint_AttrsCount;
 
+/*********************************************************************
+ * PROTOTYPES
+ */
 
 extern void   zclWaterControl_Init                           ( byte task_id );
 extern uint16 zclWaterControl_event_loop                     ( byte task_id, UINT16 events );
 extern void   zclWaterControl_ResetAttributesToDefaultValues ( app_config_t *config );
-extern uint8  zclWaterControl_GetEndpointIndex               ( uint8 endpoint );
 extern void   zclWaterControl_InitClusters                   ( void );
 
 #ifdef __cplusplus

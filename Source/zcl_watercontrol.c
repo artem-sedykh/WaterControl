@@ -38,6 +38,11 @@
 * MACROS
 */
 
+#define    DECLARE_ZLC_BASIC_RESETCB(INDEX)      static void zclWaterControl_BasicResetCB_EP##INDEX (void ){ zclWaterControl_BasicResetCB ( &zcl_Configs[INDEX] ); }
+#define    GET_ZLC_BASIC_RESETCB(INDEX)          zclWaterControl_BasicResetCB_EP##INDEX
+
+#define    DECLARE_ZLC_ON_OFFCB(INDEX)           static void zclWaterControl_OnOffCB_EP##INDEX (uint8 cmd ){ zclWaterControl_OnOffCB ( &zcl_Configs[INDEX], cmd ); }
+#define    GET_ZLC_ON_OFFCB(INDEX)               zclWaterControl_OnOffCB_EP##INDEX
 
 /*********************************************************************
 * CONSTANTS
@@ -82,12 +87,6 @@ static void      zclWaterControl_Report            ( void );
 
 static void      zclWaterControl_HandleKeys        ( byte portAndAction, byte keyCode );
 
-#define    DECLARE_ZLC_BASIC_RESETCB(INDEX)      static void zclWaterControl_BasicResetCB_EP##INDEX (void ){ zclWaterControl_BasicResetCB ( &zcl_Configs[INDEX] ); }
-#define    GET_ZLC_BASIC_RESETCB(INDEX)          zclWaterControl_BasicResetCB_EP##INDEX
-
-#define    DECLARE_ZLC_ON_OFFCB(INDEX)           static void zclWaterControl_OnOffCB_EP##INDEX (uint8 cmd ){ zclWaterControl_OnOffCB ( &zcl_Configs[INDEX], cmd ); }
-#define    GET_ZLC_ON_OFFCB(INDEX)               zclWaterControl_OnOffCB_EP##INDEX
-
 DECLARE_ZLC_BASIC_RESETCB(0)
 DECLARE_ZLC_BASIC_RESETCB(1)
 
@@ -109,7 +108,7 @@ void zclWaterControl_Init( byte task_id )
 
   zclWaterControl_InitClusters ();
 
-  for (uint8 i = 0; i < zcl_Configs_AttrsCount; i++) {
+  for (uint8 i = 0; i < zcl_EndpointsCount; i++) {
     
     bdb_RegisterSimpleDescriptor( &zclEndpoints[i] );
     
@@ -207,9 +206,7 @@ static void zclWaterControl_BasicResetCB ( app_config_t *config ) {
 }
 
 static void zclWaterControl_OnOffCB ( app_config_t *config, uint8 cmd ) {
-  uint8 endpoint = config->Endpoint; 
-
-  LREP( "[ep%d OnOffCB] command: %d \r\n", endpoint, cmd );
+  LREP( "[ep%d OnOffCB] command: %d \r\n", config->Endpoint, cmd );
 
   if (cmd == COMMAND_ON && config->Config.RelayState != 1 ) {
     config->Config.RelayState = 1;
@@ -224,11 +221,11 @@ static void zclWaterControl_OnOffCB ( app_config_t *config, uint8 cmd ) {
     return;
   }
 
-  osal_set_event (zclWaterControl_TaskID, APP_SAVE_ATTRS_EVT);
+  osal_set_event ( zclWaterControl_TaskID, APP_SAVE_ATTRS_EVT );
 
   zclWaterControl_ApplyRelay ( config );
   
-  bdb_RepChangedAttrValue (endpoint, CID_ON_OFF, ATTRID_ON_OFF );
+  bdb_RepChangedAttrValue ( config->Endpoint, CID_ON_OFF, ATTRID_ON_OFF );
 }
 
 static void zclWaterControl_ApplyRelay ( app_config_t *config ) {
@@ -237,12 +234,10 @@ static void zclWaterControl_ApplyRelay ( app_config_t *config ) {
 
 static void zclWaterControl_Increment ( app_config_t *config ) {
   uint48 *number = &(config->Config.CurrentSummDelivered);
-    
   uint8 res;
   uint32 tmp;
 
-  int i;
-  for (i = 0; i < 6; ++i) {
+  for (uint8 i = 0; i < 6; ++i) {
     tmp = number->data[i];
     res = tmp + 1;
     number->data[i] = res;
@@ -257,19 +252,20 @@ static void zclWaterControl_Increment ( app_config_t *config ) {
 }
 
 static void zclWaterControl_WriteAttrDataCB ( uint8 endpoint, zclAttrRec_t *pAttr ) {
-  uint8 index = zclWaterControl_GetEndpointIndex (endpoint);
-  zcl_Configs[index].Changed = TRUE;
-
+  for ( uint8 i = 0; i < zcl_EndpointsCount; ++i ) {
+    if ( zcl_Configs[i].Endpoint == endpoint ) {
+      zcl_Configs[i].Changed = TRUE;
+    }
+  }
+  
   LREP ( "[ep%d WriteAttrDataCB] clusterId: %d, attrId: %d changed \r\n", endpoint,pAttr->clusterID, pAttr->attr.attrId );
 
   osal_set_event (zclWaterControl_TaskID, APP_SAVE_ATTRS_EVT );
 }
 
 static void zclWaterControl_SaveAttributes ( void ) {
-
-  uint8 i = 0;  
-  for (i = 0; i < zcl_Configs_AttrsCount; ++i) {
-    if (zcl_Configs[i].Changed == FALSE) {
+  for ( uint8 i = 0; i < zcl_EndpointsCount; ++i ) {
+    if ( zcl_Configs[i].Changed == FALSE ) {
       continue;
     }
 
@@ -288,8 +284,7 @@ static void zclWaterControl_SaveAttributes ( void ) {
 }
 
 static void zclWaterControl_RestoreAttributes ( void ) {
-  uint8 i = 0;  
-  for (i = 0; i < zcl_Configs_AttrsCount; ++i) {
+  for ( uint8 i = 0; i < zcl_EndpointsCount; ++i ) {
     uint8 endpoint = zcl_Configs[i].Endpoint; 
     endpoint_config_t *config = &zcl_Configs[i].Config;
     uint16 nvId = zcl_Configs[i].NVkey;
@@ -310,15 +305,16 @@ static void zclWaterControl_RestoreAttributes ( void ) {
 }
 
 static void zclWaterControl_Report ( void ) {
-  uint8 i = 0;
-  uint8 changed = 0;
-
-  for (i = 0; i < zcl_Configs_AttrsCount; ++i) {
-    if (zcl_Configs[i].ReportCurrentSummDelivered == FALSE) { continue; }
-    changed = changed + 1;
+  bool changed = FALSE;
+  uint8 i;
+  for ( i = 0; i < zcl_EndpointsCount; ++i ) {
+    if (zcl_Configs[i].ReportCurrentSummDelivered == TRUE) { 
+      changed = TRUE;
+      break;
+    }
   }
 
-  if ( changed == 0) { return; }
+  if ( changed == FALSE ) { return; }
 
   zclReportCmd_t *pReportCmd;
   
@@ -327,7 +323,7 @@ static void zclWaterControl_Report ( void ) {
   if (pReportCmd != NULL) {
     pReportCmd->numAttr = 1;
 
-    for (i = 0; i < zcl_Configs_AttrsCount; ++i) {
+    for ( i = 0; i < zcl_EndpointsCount; ++i) {
       if (zcl_Configs[i].ReportCurrentSummDelivered == FALSE) { continue; }
 
       uint8 endpoint = zcl_Configs[i].Endpoint;
@@ -344,17 +340,15 @@ static void zclWaterControl_Report ( void ) {
     }
   }
   
-  osal_mem_free(pReportCmd);
+  osal_mem_free ( pReportCmd );
 }
 
 static void zclCommissioning_OnConnectCB ( void ) {
-  osal_start_timerEx(zclWaterControl_TaskID, APP_PUSH_STATE_EVT, 20 * 1000);
+  osal_start_timerEx ( zclWaterControl_TaskID, APP_PUSH_STATE_EVT, 20 * 1000 );
 }
 
 static void zclWaterControl_PushState ( void ) {
-  uint8 i = 0;
-
-  for (i = 0; i < zcl_Configs_AttrsCount; ++i) {
+  for ( uint8 i = 0; i < zcl_EndpointsCount; ++i ) {
     zcl_Configs[i].ReportCurrentSummDelivered = TRUE;
     bdb_RepChangedAttrValue (zcl_Configs[i].Endpoint, CID_ON_OFF, ATTRID_ON_OFF );
   }

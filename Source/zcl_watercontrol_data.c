@@ -33,7 +33,7 @@ const uint8  zclWaterControl_PowerSource         = POWER_SOURCE_MAINS_1_PHASE;
 const uint8  zclWaterControl_MeteringDeviceType  = 2;  // Water Metering see https://zigbeealliance.org/wp-content/uploads/2019/12/07-5123-06-zigbee-cluster-library-specification.pdf
 const uint8  zclWaterControl_UnitofMeasure       = 1;  //m3 (Cubic Meter) & m3/h (Cubic Meter per Hour) in pure binary format see https://zigbeealliance.org/wp-content/uploads/2019/12/07-5123-06-zigbee-cluster-library-specification.pdf
 
-const uint8  zcl_Configs_AttrsCount              = ENDPOINTS_COUNT;
+const uint8  zcl_EndpointsCount                  = ENDPOINTS_COUNT;
 
 app_config_t zcl_Configs[ENDPOINTS_COUNT] = {
   { { {0, 0, 0, 0, 0, 0}, DEFAULT_DIVISOR, DEFAULT_MULTIPLIER, DEFAULT_STATUS, DEFAULT_SUMM_FORMATTING, DEFAULT_RELAY_STATE }, FALSE, NW_HOT_CONFIG,  1, TRUE },
@@ -56,7 +56,7 @@ const cId_t zclEndpoint_OutClusterList[] = { CID_METERING };
     { CID_BASIC    ,  { ATTRID_BASIC_SW_BUILD_ID       , ZCL_CHAR_STR       , R  , (void *)zclWaterControl_DateCode                         } },    \
     { CID_BASIC    ,  { ATTRID_CLUSTER_REVISION        , ZCL_UINT16         , R  , (void *)&zclWaterControl_clusterRevision_all             } },    \
     { CID_ON_OFF   ,  { ATTRID_ON_OFF                  , ZCL_BOOLEAN        , RR , (void *)&(zcl_Configs[INDEX].Config.RelayState)          } },    \
-    { CID_METERING ,  { ATTRID_CURRENT_SUMM_DELIVERED  , ZCL_UINT48         , RRW, (void *)&zcl_Configs[INDEX].Config.CurrentSummDelivered  } },    \
+    { CID_METERING ,  { ATTRID_CURRENT_SUMM_DELIVERED  , ZCL_UINT48         , RW , (void *)&zcl_Configs[INDEX].Config.CurrentSummDelivered  } },    \
     { CID_METERING ,  { ATTRID_STATUS                  , ZCL_BITMAP8        , R  , (void *)&zcl_Configs[INDEX].Config.Status                } },    \
     { CID_METERING ,  { ATTRID_UNIT_OF_MEASURE         , ZCL_ENUM8          , R  , (void *)&zclWaterControl_UnitofMeasure                   } },    \
     { CID_METERING ,  { ATTRID_MULTIPLIER              , ZCL_UINT24         , RW , (void *)&zcl_Configs[INDEX].Config.Multiplier            } },    \
@@ -77,7 +77,7 @@ uint8 const zclEndpoint_AttrsCount = ENDPOINT_ATTRS_COUNT;
 void zclWaterControl_InitClusters ( void ) {
   uint8 i = 0;
 
-  for (i = 0; i < zcl_Configs_AttrsCount; ++i) {
+  for (i = 0; i < zcl_EndpointsCount; ++i) {
     uint8 endpoint = i + 1;
 
     zclEndpoints[i].EndPoint           = endpoint;
@@ -93,10 +93,6 @@ void zclWaterControl_InitClusters ( void ) {
   }
 }
 
-uint8 zclWaterControl_GetEndpointIndex ( uint8 endpoint ) {
-  return endpoint - 1;
-}
-
 void zclWaterControl_ResetAttributesToDefaultValues ( app_config_t *config ) {
   config->Config.Divisor        = DEFAULT_DIVISOR;
   config->Config.Multiplier     = DEFAULT_MULTIPLIER;
@@ -104,8 +100,7 @@ void zclWaterControl_ResetAttributesToDefaultValues ( app_config_t *config ) {
   config->Config.SummFormatting = DEFAULT_SUMM_FORMATTING;
   config->Config.RelayState     = DEFAULT_RELAY_STATE;
   
-  uint8 i;
-  for (i = 0; i < 6; ++i) {
+  for ( uint8 i = 0; i < 6; ++i ) {
     config->Config.CurrentSummDelivered.data[i] = 0;
   }
 }
