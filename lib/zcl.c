@@ -3498,7 +3498,9 @@ static ZStatus_t zclWriteAttrData( uint8 endpoint, afAddrType_t *srcAddr,
         uint16 len = zclGetAttrDataLength( pAttr->attr.dataType, pWriteRec->attrData );
         zcl_memcpy( pAttr->attr.dataPtr, pWriteRec->attrData, len );
 
-        zcl_WriteAttrDataCB ( endpoint,  pAttr );
+        if ( zcl_WriteAttrDataCB != NULL ) {
+          zcl_WriteAttrDataCB ( endpoint,  pAttr );
+        }
 
         status = ZCL_STATUS_SUCCESS;
       }
