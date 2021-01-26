@@ -14,7 +14,8 @@ extern "C"
 /*********************************************************************
  * CONSTANTS
  */
-#define ENDPOINTS_COUNT      2
+#define ENDPOINTS_COUNT       2
+#define ENDPOINT_ATTRS_COUNT  18 
 #define APP_REPORT_DELAY     ((uint32)5 * (uint32)1000) // 5 sec
 #define APP_SAVE_ATTRS_DELAY ((uint32)600 * (uint32)1000) // 10 minute
    
@@ -123,20 +124,16 @@ typedef struct {
 extern const uint8               zcl_Configs_AttrsCount;
 extern app_config_t              zcl_Configs[ENDPOINTS_COUNT];
 
-// hot endpoint
-extern SimpleDescriptionFormat_t zclHotEndpoint;
-extern CONST zclAttrRec_t        zclHotEndpoint_Attrs[];
-extern const uint8               zclHotEndpoint_AttrsCount;
+extern SimpleDescriptionFormat_t zclEndpoints[];
+extern CONST zclAttrRec_t        zclEndpoints_Attrs[][ENDPOINT_ATTRS_COUNT];
+extern const uint8               zclEndpoint_AttrsCount;
 
-// cold endpoint
-extern SimpleDescriptionFormat_t zclColdEndpoint;
-extern CONST zclAttrRec_t        zclColdEndpoint_Attrs[];
-extern const uint8               zclColdEndpoint_AttrsCount;
 
 extern void   zclWaterControl_Init                           ( byte task_id );
 extern uint16 zclWaterControl_event_loop                     ( byte task_id, UINT16 events );
 extern void   zclWaterControl_ResetAttributesToDefaultValues ( app_config_t *config );
 extern uint8  zclWaterControl_GetEndpointIndex               ( uint8 endpoint );
+extern void   zclWaterControl_InitClusters                   ( void );
 
 #ifdef __cplusplus
 }

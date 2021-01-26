@@ -87,26 +87,10 @@ static void      zclWaterControl_Report            ( void );
 
 static void      zclWaterControl_HandleKeys        ( byte portAndAction, byte keyCode );
 
-static zclGeneral_AppCallbacks_t zclHotEndpoint_CmdCallbacks  = {
-  zclHot_BasicResetCB,
-  NULL,
-  zclHot_OnOffCB,
-  NULL,                // On/Off cluster enhanced command Off with Effect
-  NULL,                // On/Off cluster enhanced command On with Recall Global Scene
-  NULL,                // On/Off cluster enhanced command On with Timed Off
-  NULL,                // RSSI Location command
-  NULL                 // RSSI Location Response command
-};
 
-static zclGeneral_AppCallbacks_t zclColdEndpoint_CmdCallbacks = {
-  zclCold_BasicResetCB,
-  NULL, 
-  zclCold_OnOffCB,
-  NULL,                // On/Off cluster enhanced command Off with Effect
-  NULL,                // On/Off cluster enhanced command On with Recall Global Scene
-  NULL,                // On/Off cluster enhanced command On with Timed Off
-  NULL,                // RSSI Location command
-  NULL                 // RSSI Location Response command
+static zclGeneral_AppCallbacks_t zclEndpoint_CmdCallbacks[ENDPOINTS_COUNT]  = {
+  { zclHot_BasicResetCB , NULL, zclHot_OnOffCB , NULL, NULL, NULL, NULL, NULL },
+  { zclCold_BasicResetCB, NULL, zclCold_OnOffCB, NULL, NULL, NULL, NULL, NULL },
 };
 
 void zclWaterControl_Init( byte task_id )
@@ -116,22 +100,17 @@ void zclWaterControl_Init( byte task_id )
   zclWaterControl_TaskID = task_id;
 
   zclWaterControl_RestoreAttributes ();
-  
-  bdb_RegisterSimpleDescriptor( &zclHotEndpoint );
-  
-  zclGeneral_RegisterCmdCallbacks( zclHotEndpoint.EndPoint, &zclHotEndpoint_CmdCallbacks );
-  
-  zcl_registerAttrList ( zclHotEndpoint.EndPoint, zclHotEndpoint_AttrsCount, zclHotEndpoint_Attrs );
-  
-  //--------------------------------------------------------------------------------------------------
-  
-  bdb_RegisterSimpleDescriptor( &zclColdEndpoint );
- 
-  zclGeneral_RegisterCmdCallbacks( zclColdEndpoint.EndPoint, &zclColdEndpoint_CmdCallbacks );
-  
-  zcl_registerAttrList ( zclColdEndpoint.EndPoint, zclColdEndpoint_AttrsCount, zclColdEndpoint_Attrs );
-  
-  //--------------------------------------------------------------------------------------------------
+
+  zclWaterControl_InitClusters ();
+
+  for (uint8 i = 0; i < zcl_Configs_AttrsCount; i++) {
+    
+    bdb_RegisterSimpleDescriptor( &zclEndpoints[i] );
+    
+    zclGeneral_RegisterCmdCallbacks( zclEndpoints[i].EndPoint, &(zclEndpoint_CmdCallbacks[i]));
+    
+    zcl_registerAttrList ( zclEndpoints[i].EndPoint, zclEndpoint_AttrsCount, zclEndpoints_Attrs[i] );
+  }
   
   zcl_registerWriteAttrDataCB ( zclWaterControl_WriteAttrDataCB );
 
@@ -210,13 +189,11 @@ static void zclWaterControl_HandleKeys(byte portAndAction, byte keyCode) {
 }
 
 static void zclHot_BasicResetCB ( void ) { 
-  uint8 index = zclWaterControl_GetEndpointIndex ( zclHotEndpoint.EndPoint );
-  zclWaterControl_BasicResetCB ( &zcl_Configs[index] ); 
+  zclWaterControl_BasicResetCB ( &zcl_Configs[0] ); 
 }
 
 static void zclCold_BasicResetCB ( void ) {
-  uint8 index = zclWaterControl_GetEndpointIndex ( zclColdEndpoint.EndPoint );
-  zclWaterControl_BasicResetCB ( &zcl_Configs[index] ); 
+  zclWaterControl_BasicResetCB ( &zcl_Configs[1] ); 
 }
 
 static void zclWaterControl_BasicResetCB ( app_config_t *config ) {
@@ -232,15 +209,11 @@ static void zclWaterControl_BasicResetCB ( app_config_t *config ) {
 }
 
 static void zclHot_OnOffCB ( uint8 cmd ) {
-  uint8 index = zclWaterControl_GetEndpointIndex ( zclHotEndpoint.EndPoint );
-  
-  zclWaterControl_OnOffCB ( &zcl_Configs[index], cmd ); 
+  zclWaterControl_OnOffCB ( &zcl_Configs[0], cmd ); 
 }
 
 static void zclCold_OnOffCB ( uint8 cmd ) {
-  uint8 index = zclWaterControl_GetEndpointIndex ( zclColdEndpoint.EndPoint );
-  
-  zclWaterControl_OnOffCB ( &zcl_Configs[index], cmd ); 
+  zclWaterControl_OnOffCB ( &zcl_Configs[1], cmd ); 
 }
 
 static void zclWaterControl_OnOffCB ( app_config_t *config, uint8 cmd ) {

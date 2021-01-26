@@ -3231,15 +3231,6 @@
     </configuration>
     <group>
         <name>App</name>
-        <group>
-            <name>Endpoints</name>
-            <file>
-                <name>$PROJ_DIR$\..\Source\zcl_watercontrol_cold_endpoint.c</name>
-            </file>
-            <file>
-                <name>$PROJ_DIR$\..\Source\zcl_watercontrol_hot_endpoint.c</name>
-            </file>
-        </group>
         <file>
             <name>$PROJ_DIR$\..\Source\OSAL_WaterControl.c</name>
         </file>
@@ -3260,9 +3251,6 @@
         </file>
         <file>
             <name>$PROJ_DIR$\..\Source\zcl_watercontrol_data.c</name>
-        </file>
-        <file>
-            <name>$PROJ_DIR$\..\Source\zcl_watercontrol_data.h</name>
         </file>
     </group>
     <group>
@@ -3415,10 +3403,10 @@
             <name>$PROJ_DIR$\..\lib\commissioning.h</name>
         </file>
         <file>
-            <name>$PROJ_DIR$\..\lib\Debug.c</name>
+            <name>$PROJ_DIR$\..\lib\debug.c</name>
         </file>
         <file>
-            <name>$PROJ_DIR$\..\lib\Debug.h</name>
+            <name>$PROJ_DIR$\..\lib\debug.h</name>
         </file>
         <file>
             <name>$PROJ_DIR$\..\lib\factory_reset.c</name>
@@ -3431,6 +3419,9 @@
         </file>
         <file>
             <name>$PROJ_DIR$\..\lib\hal_key.h</name>
+        </file>
+        <file>
+            <name>$PROJ_DIR$\..\lib\uint48.h</name>
         </file>
     </group>
     <group>
