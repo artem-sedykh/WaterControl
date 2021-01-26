@@ -55,14 +55,14 @@ const cId_t zclEndpoint_OutClusterList[] = { CID_METERING };
     { CID_BASIC    ,  { ATTRID_BASIC_POWER_SOURCE      , ZCL_ENUM8          , R  , (void *)&zclWaterControl_PowerSource                     } },    \
     { CID_BASIC    ,  { ATTRID_BASIC_SW_BUILD_ID       , ZCL_CHAR_STR       , R  , (void *)zclWaterControl_DateCode                         } },    \
     { CID_BASIC    ,  { ATTRID_CLUSTER_REVISION        , ZCL_UINT16         , R  , (void *)&zclWaterControl_clusterRevision_all             } },    \
-    { CID_ON_OFF   ,  { ATTRID_ON_OFF                   , ZCL_BOOLEAN        , RR , (void *)&(zcl_Configs[INDEX].Config.RelayState)         } },    \
-    { CID_METERING ,  { ATTRID_CURRENT_SUMM_DELIVERED   , ZCL_UINT48         , RRW, (void *)&zcl_Configs[INDEX].Config.CurrentSummDelivered } },    \
-    { CID_METERING ,  { ATTRID_STATUS                   , ZCL_BITMAP8        , R  , (void *)&zcl_Configs[INDEX].Config.Status               } },    \
-    { CID_METERING ,  { ATTRID_UNIT_OF_MEASURE          , ZCL_ENUM8          , R  , (void *)&zclWaterControl_UnitofMeasure                  } },    \
-    { CID_METERING ,  { ATTRID_MULTIPLIER               , ZCL_UINT24         , RW , (void *)&zcl_Configs[INDEX].Config.Multiplier           } },    \
-    { CID_METERING ,  { ATTRID_DIVISOR                  , ZCL_UINT24         , RW , (void *)&zcl_Configs[INDEX].Config.Divisor              } },    \
-    { CID_METERING ,  { ATTRID_SUMM_FORMATTING          , ZCL_BITMAP8        , R  , (void *)&zcl_Configs[INDEX].Config.SummFormatting       } },    \
-    { CID_METERING ,  { ATTRID_METERING_DEVICE_TYPE     , ZCL_BITMAP8        , R  , (void *)&zclWaterControl_MeteringDeviceType             } },    \
+    { CID_ON_OFF   ,  { ATTRID_ON_OFF                  , ZCL_BOOLEAN        , RR , (void *)&(zcl_Configs[INDEX].Config.RelayState)          } },    \
+    { CID_METERING ,  { ATTRID_CURRENT_SUMM_DELIVERED  , ZCL_UINT48         , RRW, (void *)&zcl_Configs[INDEX].Config.CurrentSummDelivered  } },    \
+    { CID_METERING ,  { ATTRID_STATUS                  , ZCL_BITMAP8        , R  , (void *)&zcl_Configs[INDEX].Config.Status                } },    \
+    { CID_METERING ,  { ATTRID_UNIT_OF_MEASURE         , ZCL_ENUM8          , R  , (void *)&zclWaterControl_UnitofMeasure                   } },    \
+    { CID_METERING ,  { ATTRID_MULTIPLIER              , ZCL_UINT24         , RW , (void *)&zcl_Configs[INDEX].Config.Multiplier            } },    \
+    { CID_METERING ,  { ATTRID_DIVISOR                 , ZCL_UINT24         , RW , (void *)&zcl_Configs[INDEX].Config.Divisor               } },    \
+    { CID_METERING ,  { ATTRID_SUMM_FORMATTING         , ZCL_BITMAP8        , R  , (void *)&zcl_Configs[INDEX].Config.SummFormatting        } },    \
+    { CID_METERING ,  { ATTRID_METERING_DEVICE_TYPE    , ZCL_BITMAP8        , R  , (void *)&zclWaterControl_MeteringDeviceType              } },    \
   }                                                                                                                                                 \
 
 CONST zclAttrRec_t zclEndpoints_Attrs[][ENDPOINT_ATTRS_COUNT] = { ZCL_ENDPOINT_ATTRS(0), ZCL_ENDPOINT_ATTRS(1) };
