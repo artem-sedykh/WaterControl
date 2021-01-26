@@ -73,12 +73,7 @@ static void      zclWaterControl_SaveAttributes    ( void );
 static void      zclWaterControl_RestoreAttributes ( void );
 
 static void      zclWaterControl_BasicResetCB      ( app_config_t *config );
-static void      zclHot_BasicResetCB               ( void );
-static void      zclCold_BasicResetCB              ( void );
-
 static void      zclWaterControl_OnOffCB           ( app_config_t *config, uint8 cmd );
-static void      zclHot_OnOffCB                    ( uint8 );
-static void      zclCold_OnOffCB                   ( uint8 );
 
 static void      zclWaterControl_ApplyRelay        ( app_config_t *config );
 static void      zclWaterControl_Increment         ( app_config_t *config );
@@ -87,10 +82,21 @@ static void      zclWaterControl_Report            ( void );
 
 static void      zclWaterControl_HandleKeys        ( byte portAndAction, byte keyCode );
 
+#define    DECLARE_ZLC_BASIC_RESETCB(INDEX)      static void zclWaterControl_BasicResetCB_EP##INDEX (void ){ zclWaterControl_BasicResetCB ( &zcl_Configs[INDEX] ); }
+#define    GET_ZLC_BASIC_RESETCB(INDEX)          zclWaterControl_BasicResetCB_EP##INDEX
+
+#define    DECLARE_ZLC_ON_OFFCB(INDEX)           static void zclWaterControl_OnOffCB_EP##INDEX (uint8 cmd ){ zclWaterControl_OnOffCB ( &zcl_Configs[INDEX], cmd ); }
+#define    GET_ZLC_ON_OFFCB(INDEX)               zclWaterControl_OnOffCB_EP##INDEX
+
+DECLARE_ZLC_BASIC_RESETCB(0)
+DECLARE_ZLC_BASIC_RESETCB(1)
+
+DECLARE_ZLC_ON_OFFCB(0)
+DECLARE_ZLC_ON_OFFCB(1)
 
 static zclGeneral_AppCallbacks_t zclEndpoint_CmdCallbacks[ENDPOINTS_COUNT]  = {
-  { zclHot_BasicResetCB , NULL, zclHot_OnOffCB , NULL, NULL, NULL, NULL, NULL },
-  { zclCold_BasicResetCB, NULL, zclCold_OnOffCB, NULL, NULL, NULL, NULL, NULL },
+  { GET_ZLC_BASIC_RESETCB(0), NULL, GET_ZLC_ON_OFFCB(0) , NULL, NULL, NULL, NULL, NULL },
+  { GET_ZLC_BASIC_RESETCB(1), NULL, GET_ZLC_ON_OFFCB(1), NULL, NULL, NULL, NULL, NULL },
 };
 
 void zclWaterControl_Init( byte task_id )
@@ -188,14 +194,6 @@ static void zclWaterControl_HandleKeys(byte portAndAction, byte keyCode) {
   // }
 }
 
-static void zclHot_BasicResetCB ( void ) { 
-  zclWaterControl_BasicResetCB ( &zcl_Configs[0] ); 
-}
-
-static void zclCold_BasicResetCB ( void ) {
-  zclWaterControl_BasicResetCB ( &zcl_Configs[1] ); 
-}
-
 static void zclWaterControl_BasicResetCB ( app_config_t *config ) {
   uint8 endpoint = config->Endpoint;
 
@@ -206,14 +204,6 @@ static void zclWaterControl_BasicResetCB ( app_config_t *config ) {
   config->Changed = TRUE;
 
   osal_set_event (zclWaterControl_TaskID, APP_SAVE_ATTRS_EVT );
-}
-
-static void zclHot_OnOffCB ( uint8 cmd ) {
-  zclWaterControl_OnOffCB ( &zcl_Configs[0], cmd ); 
-}
-
-static void zclCold_OnOffCB ( uint8 cmd ) {
-  zclWaterControl_OnOffCB ( &zcl_Configs[1], cmd ); 
 }
 
 static void zclWaterControl_OnOffCB ( app_config_t *config, uint8 cmd ) {
