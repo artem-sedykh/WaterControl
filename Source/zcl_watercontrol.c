@@ -385,7 +385,7 @@ static void zclWaterControl_Report ( void ) {
 }
 
 static void zclCommissioning_OnConnectCB ( void ) {
-  osal_start_timerEx(zclWaterControl_TaskID, APP_PUSH_STATE_EVT, 10 * 1000);
+  osal_start_timerEx(zclWaterControl_TaskID, APP_PUSH_STATE_EVT, 20 * 1000);
 }
 
 static void zclWaterControl_PushState ( void ) {
