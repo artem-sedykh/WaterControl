@@ -70,7 +70,6 @@ static void      zclWaterControl_RestoreAttributes ( void );
 static void      zclWaterControl_BasicResetCB      ( app_config_t *config );
 static void      zclWaterControl_OnOffCB           ( app_config_t *config, uint8 cmd );
 static void      zclWaterControl_ApplyRelay        ( app_config_t *config );
-
 static void      zclWaterControl_Increment         ( app_config_t *config );
 static void      zclWaterControl_Report            ( void );
 
@@ -220,10 +219,10 @@ static void zclWaterControl_OnOffCB ( app_config_t *config, uint8 cmd ) {
   }
 
   zclWaterControl_ApplyRelay ( config );
-
-  osal_set_event ( zclWaterControl_TaskID, APP_SAVE_ATTRS_EVT );
   
   bdb_RepChangedAttrValue ( config->Endpoint, CID_ON_OFF, ATTRID_ON_OFF );
+
+  osal_set_event ( zclWaterControl_TaskID, APP_SAVE_ATTRS_EVT );
 }
 
 static void zclWaterControl_ApplyRelay ( app_config_t *config ) {
