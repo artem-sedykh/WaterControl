@@ -40,13 +40,21 @@ const ACCESS_READ = 0b100;
 
 const tz = {
     metering: {
-        key: ['currentSummDelivered', 'multiplier', 'divisor'],
+        key: ['currentSummDelivered', 'multiplier', 'divisor', 'reset'],
         convertSet: async (entity, key, value, meta) => {
             let propertyName = key;
             const state = {};
 
-            if(meta.endpoint_name) {
+            if (meta.endpoint_name) {
                 propertyName = `${propertyName}_${meta.endpoint_name}`;
+            }
+
+            if (key === 'reset') {
+                await entity.command('genBasic', 'resetFactDefault', {}, {});
+                await entity.read('seMetering', ['divisor']);
+                await entity.read('seMetering', ['multiplier']);
+                await entity.read('seMetering', ['currentSummDelivered']);
+                return {};
             }
 
             if (key === 'currentSummDelivered') {
@@ -58,7 +66,6 @@ const tz = {
                 const msb = buffer.readUInt16LE(4);
 
                 await entity.write('seMetering', {0x0000: {value: [msb, lsb], type: 37}});
-
                 await entity.read('seMetering', ['currentSummDelivered']);
 
                 return {};
@@ -67,6 +74,7 @@ const tz = {
             if (key === 'divisor') {
                 value = parseInt(value);
                 state[propertyName] = value;
+
                 await entity.write('seMetering', {0x0302: {value: value, type: 34}});
                 await entity.read('seMetering', ['divisor']);
                 await entity.read('seMetering', ['currentSummDelivered']);
@@ -173,10 +181,7 @@ const device = {
         }
     },
     exposes: [
-        exposes
-            .switch()
-            .withState('state', true)
-            .withEndpoint('heat'),
+        exposes.switch().withState('state', true).withEndpoint('heat'),
         exposes.numeric('currentSummDelivered', ACCESS_STATE | ACCESS_READ).withEndpoint('heat'),
         exposes.text('unitOfMeasure', ACCESS_STATE).withEndpoint('heat'),
         exposes.numeric('multiplier', ACCESS_STATE | ACCESS_READ).withEndpoint('heat'),
