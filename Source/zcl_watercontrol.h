@@ -55,12 +55,15 @@ extern "C"
 /*********************************************************************
  * MACROS
  */
+#define R                                    (ACCESS_CONTROL_READ)
+#define RW                                   (R | ACCESS_CONTROL_WRITE | ACCESS_CONTROL_AUTH_WRITE)
+#define RR                                   (ACCESS_CONTROL_READ | ACCESS_REPORTABLE)
+#define RRW                                  (ACCESS_CONTROL_READ | ACCESS_CONTROL_WRITE | ACCESS_CONTROL_AUTH_WRITE | ACCESS_REPORTABLE)
 
-#define R                               (ACCESS_CONTROL_READ)
-#define RW                              (R | ACCESS_CONTROL_WRITE | ACCESS_CONTROL_AUTH_WRITE)
-#define RR                              (ACCESS_CONTROL_READ | ACCESS_REPORTABLE)
-#define RRW                             (ACCESS_CONTROL_READ | ACCESS_CONTROL_WRITE | ACCESS_CONTROL_AUTH_WRITE | ACCESS_REPORTABLE)
-
+#define DECLARE_APPLY_RELAY(INDEX)           static void ApplyRelay_EP##INDEX (uint8 state ){ HAL_APPLY_RELAY##INDEX(state); }
+#define DECLARE_BASIC_RESETCB(INDEX)         static void zclWaterControl_BasicResetCB_EP##INDEX (void ){ zclWaterControl_BasicResetCB ( &zcl_Configs[INDEX] ); }
+#define DECLARE_ON_OFFCB(INDEX)              static void zclWaterControl_OnOffCB_EP##INDEX (uint8 cmd ){ zclWaterControl_OnOffCB ( &zcl_Configs[INDEX], cmd ); }
+#define GET_FUNC(NAME, INDEX)                NAME## _EP ##INDEX
 /*********************************************************************
  * TYPEDEFS
  */
@@ -105,17 +108,18 @@ typedef struct {
   Bits 3 to 6: Number of Digits to the left of the Decimal Point.
   Bit 7: If set, suppress leading zeros. */
   uint8  SummFormatting;
-  
+
 /*Relay status: 0 - OFF, 1 - ON */
   uint8  RelayState;
 } endpoint_config_t;
 
 typedef struct {
   endpoint_config_t Config;
-  bool Changed;
-  uint16 NVkey;
-  uint8 Endpoint;
-  bool ReportCurrentSummDelivered;
+  bool              Changed;
+  uint16            NVkey;
+  uint8             Endpoint;
+  bool              ReportCurrentSummDelivered;
+  void (*ApplyRelay) (uint8);
 } app_config_t;
      
 /*********************************************************************

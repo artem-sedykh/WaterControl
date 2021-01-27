@@ -35,16 +35,6 @@
 #include "uint48.h"
 
 /*********************************************************************
-* MACROS
-*/
-
-#define    DECLARE_ZLC_BASIC_RESETCB(INDEX)      static void zclWaterControl_BasicResetCB_EP##INDEX (void ){ zclWaterControl_BasicResetCB ( &zcl_Configs[INDEX] ); }
-#define    GET_ZLC_BASIC_RESETCB(INDEX)          zclWaterControl_BasicResetCB_EP##INDEX
-
-#define    DECLARE_ZLC_ON_OFFCB(INDEX)           static void zclWaterControl_OnOffCB_EP##INDEX (uint8 cmd ){ zclWaterControl_OnOffCB ( &zcl_Configs[INDEX], cmd ); }
-#define    GET_ZLC_ON_OFFCB(INDEX)               zclWaterControl_OnOffCB_EP##INDEX
-
-/*********************************************************************
 * CONSTANTS
 */
 
@@ -79,23 +69,22 @@ static void      zclWaterControl_RestoreAttributes ( void );
 
 static void      zclWaterControl_BasicResetCB      ( app_config_t *config );
 static void      zclWaterControl_OnOffCB           ( app_config_t *config, uint8 cmd );
-
 static void      zclWaterControl_ApplyRelay        ( app_config_t *config );
-static void      zclWaterControl_Increment         ( app_config_t *config );
 
+static void      zclWaterControl_Increment         ( app_config_t *config );
 static void      zclWaterControl_Report            ( void );
 
 static void      zclWaterControl_HandleKeys        ( byte portAndAction, byte keyCode );
 
-DECLARE_ZLC_BASIC_RESETCB(0)
-DECLARE_ZLC_BASIC_RESETCB(1)
+DECLARE_BASIC_RESETCB(0) //zclWaterControl_BasicResetCB_EP0
+DECLARE_BASIC_RESETCB(1) //zclWaterControl_BasicResetCB_EP1
 
-DECLARE_ZLC_ON_OFFCB(0)
-DECLARE_ZLC_ON_OFFCB(1)
+DECLARE_ON_OFFCB(0)      //zclWaterControl_OnOffCB_EP0
+DECLARE_ON_OFFCB(1)      //zclWaterControl_OnOffCB_EP1
 
 static zclGeneral_AppCallbacks_t zclEndpoint_CmdCallbacks[ENDPOINTS_COUNT]  = {
-  { GET_ZLC_BASIC_RESETCB(0), NULL, GET_ZLC_ON_OFFCB(0), NULL, NULL, NULL, NULL, NULL },
-  { GET_ZLC_BASIC_RESETCB(1), NULL, GET_ZLC_ON_OFFCB(1), NULL, NULL, NULL, NULL, NULL },
+  { GET_FUNC(zclWaterControl_BasicResetCB, 0), NULL, GET_FUNC(zclWaterControl_OnOffCB, 0), NULL, NULL, NULL, NULL, NULL },
+  { GET_FUNC(zclWaterControl_BasicResetCB, 1), NULL, GET_FUNC(zclWaterControl_OnOffCB, 1), NULL, NULL, NULL, NULL, NULL },
 };
 
 void zclWaterControl_Init( byte task_id )
@@ -109,6 +98,8 @@ void zclWaterControl_Init( byte task_id )
   zclWaterControl_InitClusters ();
 
   for (uint8 i = 0; i < zcl_EndpointsCount; i++) {
+
+    zclWaterControl_ApplyRelay ( &zcl_Configs[i] );
     
     bdb_RegisterSimpleDescriptor( &zclEndpoints[i] );
     
@@ -236,7 +227,8 @@ static void zclWaterControl_OnOffCB ( app_config_t *config, uint8 cmd ) {
 }
 
 static void zclWaterControl_ApplyRelay ( app_config_t *config ) {
-  //TODO: Impl it!!!
+  uint8 state = config->Config.RelayState;
+  config->ApplyRelay ( state );
 }
 
 static void zclWaterControl_Increment ( app_config_t *config ) {

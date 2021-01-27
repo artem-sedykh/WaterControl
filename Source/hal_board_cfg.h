@@ -82,6 +82,17 @@
   #define LED4_DDR          P1DIR
   #define LED4_POLARITY     ACTIVE_HIGH
 
+  #define RELAY1_BV           BV(4)
+  #define RELAY1_SBIT         P0_4
+  #define RELAY1_OUT_BV       BV(5)
+  #define RELAY1_DDR          P0DIR
+
+  #define RELAY_POLARITY      ACTIVE_LOW
+
+  #define RELAY2_BV           BV(6)
+  #define RELAY2_SBIT         P0_6
+  #define RELAY2_OUT_SBIT     P0_7
+  #define RELAY2_DDR          P0DIR
 #elif defined(HAL_BOARD_CHDTECH_DEV)
   #define LED1_BV           BV(0)
   #define LED1_SBIT         P1_0
@@ -103,6 +114,16 @@
   #define LED4_SBIT         P1_4
   #define LED4_DDR          P1DIR
   #define LED4_POLARITY     ACTIVE_LOW
+
+  #define RELAY1_BV           BV(4)
+  #define RELAY1_SBIT         P0_4
+  #define RELAY1_DDR          P0DIR
+
+  #define RELAY_POLARITY      ACTIVE_LOW
+
+  #define RELAY2_BV           BV(6)
+  #define RELAY2_SBIT         P0_6
+  #define RELAY2_DDR          P0DIR
 #endif
 
 
@@ -215,6 +236,9 @@ extern void MAC_RfFrontendSetup(void);
   LED1_DDR |= LED1_BV;                                           \
   LED2_DDR |= LED2_BV;                                           \
   LED3_DDR |= LED3_BV;                                           \
+                                                                 \
+  RELAY1_DDR |= RELAY1_BV;                                       \
+  RELAY2_DDR |= RELAY2_BV;                                       \
 }
 
 #elif defined (HAL_PA_LNA)
@@ -247,6 +271,9 @@ extern void MAC_RfFrontendSetup(void);
   LED1_DDR |= LED1_BV;                                           \
   LED2_DDR |= LED2_BV;                                           \
   LED3_DDR |= LED3_BV;                                           \
+                                                                 \
+  RELAY1_DDR |= RELAY1_BV;                                       \
+  RELAY2_DDR |= RELAY2_BV;                                       \
 }
 
 #elif defined (HAL_PA_LNA_CC2592) || defined (HAL_PA_LNA_SE2431L)
@@ -279,6 +306,9 @@ extern void MAC_RfFrontendSetup(void);
   LED1_DDR |= LED1_BV;                                           \
   LED2_DDR |= LED2_BV;                                           \
   LED3_DDR |= LED3_BV;                                           \
+                                                                 \
+  RELAY1_DDR |= RELAY1_BV;                                       \
+  RELAY2_DDR |= RELAY2_BV;                                       \
 }
 #endif
 
@@ -292,6 +322,12 @@ extern void MAC_RfFrontendSetup(void);
 #define HAL_PUSH_BUTTON4()        (0)
 #define HAL_PUSH_BUTTON5()        (0)
 #define HAL_PUSH_BUTTON6()        (0)
+
+/* ------------- Relays  -------------- */
+
+#define HAL_APPLY_RELAY0(STATE)   st( RELAY1_SBIT = RELAY_POLARITY (STATE); )
+#define HAL_APPLY_RELAY1(STATE)   st( RELAY2_SBIT = RELAY_POLARITY (STATE); )
+
 
 /* ----------- LED's ---------- */
 #define HAL_TURN_OFF_LED1()       st( LED1_SBIT = LED1_POLARITY (0); )
