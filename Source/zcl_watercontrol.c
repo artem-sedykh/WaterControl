@@ -86,8 +86,8 @@ static zclGeneral_AppCallbacks_t zclEndpoint_CmdCallbacks[ENDPOINTS_COUNT]  = {
   { GET_FUNC(zclWaterControl_BasicResetCB, 1), NULL, GET_FUNC(zclWaterControl_OnOffCB, 1), NULL, NULL, NULL, NULL, NULL },
 };
 
-void zclWaterControl_Init( byte task_id )
-{
+void zclWaterControl_Init( byte task_id ) {
+  
   HalLedSet(HAL_LED_ALL, HAL_LED_MODE_BLINK);
   
   zclWaterControl_TaskID = task_id;
@@ -97,7 +97,6 @@ void zclWaterControl_Init( byte task_id )
   zclWaterControl_InitClusters ();
 
   for (uint8 i = 0; i < zcl_EndpointsCount; i++) {
-
     zclWaterControl_ApplyRelay ( &zcl_Configs[i] );
     
     bdb_RegisterSimpleDescriptor( &zclEndpoints[i] );
@@ -129,9 +128,9 @@ uint16 zclWaterControl_event_loop( uint8 task_id, uint16 events ) {
     while ((MSGpkt = (afIncomingMSGPacket_t *)osal_msg_receive(zclWaterControl_TaskID))) {
       LREP("MSGpkt->hdr.event 0x%X clusterId=0x%X\r\n", MSGpkt->hdr.event, MSGpkt->clusterId);
       switch (MSGpkt->hdr.event) {
-      case KEY_CHANGE:
-        zclWaterControl_HandleKeys(((keyChange_t *)MSGpkt)->state, ((keyChange_t *)MSGpkt)->keys);
-        break;
+        case KEY_CHANGE:
+          zclWaterControl_HandleKeys ( ((keyChange_t *)MSGpkt)->state, ((keyChange_t *)MSGpkt)->keys );
+          break;
         
       case ZCL_INCOMING_MSG:
         if (((zclIncomingMsg_t *)MSGpkt)->attrCmd) {
@@ -167,20 +166,23 @@ uint16 zclWaterControl_event_loop( uint8 task_id, uint16 events ) {
   return 0;
 }
 
-static void zclWaterControl_HandleKeys(byte portAndAction, byte keyCode) {
+static void zclWaterControl_HandleKeys ( byte portAndAction, byte keyCode ) {
+  uint8 key_pressed = HAL_IS_KEY_PRESSED(portAndAction);
+  uint8 port = HAL_CLEAR_KEY_PRESSED_BIT(portAndAction);
+  LREP("port: %d, key: %d, key_pressed: %d  \r\n", port, keyCode, key_pressed);
 
-  LREP ( "[HandleKeys] portAndAction=0x%X keyCode=0x%X\r\n", portAndAction, keyCode );
-  //HalLedSet(HAL_LED_1, HAL_LED_MODE_BLINK);
+  if ( key_pressed == FALSE) {
+    for ( uint8 i = 0; i < zcl_EndpointsCount; i++ ) {
+      if ( zcl_Configs[i].Counter.Port == port && zcl_Configs[i].Counter.Key == keyCode ) {
+        zclWaterControl_Increment ( &zcl_Configs[i] );
+      }
+    }
+  }
   
-  //    HalLedSet(HAL_LED_2, HAL_LED_MODE_BLINK);
-  //    HalLedSet(HAL_LED_3, HAL_LED_MODE_BLINK);
-  //    zclFactoryResetter_HandleKeys(portAndAction, keyCode);
-  // zclCommissioning_HandleKeys(portAndAction, keyCode);
-
-  // if (portAndAction & HAL_KEY_PRESS) {
-  //   LREPMaster("Key press\r\n");
-  //   zclWaterControl_Report();
-  // }
+  if ( port == HAL_RESET_BUTTON_KEY_PORT && keyCode == HAL_RESET_BUTTON_SBIT ) {
+    zclFactoryResetter_HandleKeys ( port, keyCode, key_pressed );
+    zclCommissioning_HandleKeys ( port, keyCode, key_pressed );
+  }
 }
 
 static void zclWaterControl_BasicResetCB ( app_config_t *config ) {

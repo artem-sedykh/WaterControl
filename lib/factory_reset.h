@@ -36,5 +36,5 @@
 
 extern void zclFactoryResetter_Init(uint8 task_id);
 extern uint16 zclFactoryResetter_loop(uint8 task_id, uint16 events);
-extern void zclFactoryResetter_HandleKeys(uint8 portAndAction, uint8 keyCode);
+extern void zclFactoryResetter_HandleKeys(uint8 port, uint8 keyCode, bool key_pressed);
 #endif

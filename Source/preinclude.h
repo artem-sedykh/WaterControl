@@ -48,7 +48,8 @@
 #endif
 
 #if defined(HAL_BOARD_TARGET)
-    #define HAL_KEY_P2_INPUT_PINS BV(0)
+//    #define HAL_KEY_P0_INPUT_PINS BV(1)
+//    #define HAL_KEY_P1_INPUT_PINS (BV(2) | BV(3))
     #define CO2_UART_PORT 0x00
     #define HAL_UART_DMA 1
     #define HAL_UART_ISR 0
@@ -57,7 +58,18 @@
     #define HAL_UART_DMA 1
     #define HAL_UART_ISR 2
     #define CO2_UART_PORT  0x01
-    #define HAL_KEY_P0_INPUT_PINS BV(1)
+
+    #define HAL_RESET_BUTTON_SBIT     BV(1)
+    #define HAL_HOT_COUNTER_SBIT      BV(2)
+    #define HAL_COLD_COUNTER_SBIT     BV(3)
+
+    #define HAL_HOT_KEY_PORT          HAL_KEY_PORT1
+    #define HAL_COLD_KEY_PORT         HAL_KEY_PORT1
+    #define HAL_RESET_BUTTON_KEY_PORT HAL_KEY_PORT0
+
+    #define HAL_KEY_P0_INPUT_PINS     HAL_RESET_BUTTON_SBIT
+    #define HAL_KEY_P1_INPUT_PINS     HAL_HOT_COUNTER_SBIT | HAL_COLD_COUNTER_SBIT
+
     #define DO_DEBUG_UART
 #endif
 
@@ -68,7 +80,6 @@
     #define HAL_UART_DMA 1
     #define INT_HEAP_LEN 2060
 #endif
-
 
 #define HAL_UART TRUE
 

@@ -136,12 +136,17 @@ typedef struct {
 } endpoint_config_t;//TODO: rename to endpoint_data_t
 
 typedef struct {
+  uint8 Port;
+  uint8 Key;
+} counter_config_t;
+typedef struct {
   endpoint_config_t Config;
   bool              Changed;
   uint16            NVkey;
   uint8             Endpoint;
   bool              ReportCurrentSummDelivered;
   void (*ApplyRelay) (uint8);
+  counter_config_t  Counter;
 } app_config_t;//TODO: : rename to endpoint_config_t
      
 /*********************************************************************

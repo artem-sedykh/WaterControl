@@ -70,32 +70,33 @@ void halProcessKeyInterrupt(uint8 portNum);
 void HalKeyPoll(void) {
     uint8 pinStatus = 0;
     bool isPressed = false;
+    
     switch (portNum) {
-    case HAL_KEY_PORT0:
-        PICTL ^= HAL_KEY_P0_EDGE_BITS; // flip edge bit
-        pinStatus = P0 & pinNum;
-        isPressed = HAL_KEY_P0_INPUT_PINS_EDGE != !!(pinStatus);
-        break;
+      case HAL_KEY_PORT0:
+          PICTL ^= HAL_KEY_P0_EDGE_BITS; // flip edge bit
+          pinStatus = P0 & pinNum;
+          isPressed = HAL_KEY_P0_INPUT_PINS_EDGE != !!(pinStatus);
+          break;
 
-    case HAL_KEY_PORT1:
-        PICTL ^= HAL_KEY_P1_EDGE_BITS; // flip edge bit
-        pinStatus = P1 & pinNum;
-        isPressed = HAL_KEY_P1_INPUT_PINS_EDGE != !!(pinStatus);
-        break;
+      case HAL_KEY_PORT1:
+          PICTL ^= HAL_KEY_P1_EDGE_BITS; // flip edge bit
+          pinStatus = P1 & pinNum;
+          isPressed = HAL_KEY_P1_INPUT_PINS_EDGE != !!(pinStatus);
+          break;
 
-    case HAL_KEY_PORT2:
-        PICTL ^= HAL_KEY_P2_EDGE_BITS; // flip edge bit
-        pinStatus = P2 & pinNum;
-        isPressed = HAL_KEY_P2_INPUT_PINS_EDGE != !!(pinStatus);
-        break;
+      case HAL_KEY_PORT2:
+          PICTL ^= HAL_KEY_P2_EDGE_BITS; // flip edge bit
+          pinStatus = P2 & pinNum;
+          isPressed = HAL_KEY_P2_INPUT_PINS_EDGE != !!(pinStatus);
+          break;
 
-    default:
+      default:
         break;
     }
-    LREP("portNum=0x%X pinNum=0x%X isPressed=%d\r\n", portNum, pinNum, isPressed);
-
-    // LREP("pinStatus=" BYTE_TO_BINARY_PATTERN "\r\n", BYTE_TO_BINARY(pinStatus));
-    OnBoard_SendKeys(pinNum, (isPressed ? HAL_KEY_PRESS : HAL_KEY_RELEASE) | portNum);
+    
+    if ( isPressed ) { SET_HAL_KEY_PRESSED(portNum); }
+    
+    OnBoard_SendKeys(pinNum, portNum);
 }
 
 void HalKeyInit(void) {

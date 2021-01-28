@@ -3,6 +3,7 @@
 #include "zcl_ha.h"
 #include "version.h"
 #include "hal_board.h"
+#include "hal_key.h"
 
 #define APP_DEVICE_VERSION      1
 #define APP_FLAGS               0
@@ -43,8 +44,8 @@ const uint8  zclWaterControl_UnitofMeasure       = 1;  //m3 (Cubic Meter) & m3/h
 const uint8  zcl_EndpointsCount                  = ENDPOINTS_COUNT;
 
 app_config_t zcl_Configs[ENDPOINTS_COUNT] = {
-  { { {0, 0, 0, 0, 0, 0}, DEFAULT_DIVISOR, DEFAULT_MULTIPLIER, DEFAULT_STATUS, DEFAULT_SUMM_FORMATTING, DEFAULT_RELAY_STATE }, FALSE, NW_HOT_CONFIG,  1, TRUE, GET_FUNC(ApplyRelay, 0) },
-  { { {0, 0, 0, 0, 0, 0}, DEFAULT_DIVISOR, DEFAULT_MULTIPLIER, DEFAULT_STATUS, DEFAULT_SUMM_FORMATTING, DEFAULT_RELAY_STATE }, FALSE, NW_COLD_CONFIG, 2, TRUE, GET_FUNC(ApplyRelay, 1) }
+  { { {0, 0, 0, 0, 0, 0}, DEFAULT_DIVISOR, DEFAULT_MULTIPLIER, DEFAULT_STATUS, DEFAULT_SUMM_FORMATTING, DEFAULT_RELAY_STATE }, FALSE, NW_HOT_CONFIG , 1, TRUE, GET_FUNC(ApplyRelay, 0), { HAL_HOT_KEY_PORT , HAL_HOT_COUNTER_SBIT } },
+  { { {0, 0, 0, 0, 0, 0}, DEFAULT_DIVISOR, DEFAULT_MULTIPLIER, DEFAULT_STATUS, DEFAULT_SUMM_FORMATTING, DEFAULT_RELAY_STATE }, FALSE, NW_COLD_CONFIG, 2, TRUE, GET_FUNC(ApplyRelay, 1), { HAL_COLD_KEY_PORT, HAL_COLD_COUNTER_SBIT } }
 };
 
 const cId_t zclEndpoint_InClusterList[]                       = { CID_BASIC, CID_GROUPS, CID_ON_OFF };
