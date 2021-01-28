@@ -19,6 +19,12 @@
 #define DEFAULT_SUMM_FORMATTING 251 //0b11111011
 #define DEFAULT_RELAY_STATE     1
 
+/*********************************************************************
+* LOCAL FUNCTIONS
+*/
+DECLARE_APPLY_RELAY(0)
+DECLARE_APPLY_RELAY(1)
+
 // Global attributes
 const uint16 zclWaterControl_clusterRevision_all = 0x0001; 
 
@@ -36,39 +42,13 @@ const uint8  zclWaterControl_UnitofMeasure       = 1;  //m3 (Cubic Meter) & m3/h
 
 const uint8  zcl_EndpointsCount                  = ENDPOINTS_COUNT;
 
-DECLARE_APPLY_RELAY(0)
-DECLARE_APPLY_RELAY(1)
-
 app_config_t zcl_Configs[ENDPOINTS_COUNT] = {
   { { {0, 0, 0, 0, 0, 0}, DEFAULT_DIVISOR, DEFAULT_MULTIPLIER, DEFAULT_STATUS, DEFAULT_SUMM_FORMATTING, DEFAULT_RELAY_STATE }, FALSE, NW_HOT_CONFIG,  1, TRUE, GET_FUNC(ApplyRelay, 0) },
   { { {0, 0, 0, 0, 0, 0}, DEFAULT_DIVISOR, DEFAULT_MULTIPLIER, DEFAULT_STATUS, DEFAULT_SUMM_FORMATTING, DEFAULT_RELAY_STATE }, FALSE, NW_COLD_CONFIG, 2, TRUE, GET_FUNC(ApplyRelay, 1) }
 };
 
-const cId_t zclEndpoint_InClusterList[]  = { CID_BASIC, CID_GROUPS, CID_ON_OFF };
-const cId_t zclEndpoint_OutClusterList[] = { CID_METERING };
-
-#define ZCL_ENDPOINT_ATTRS(INDEX)                                                                                                                   \
-  {                                                                                                                                                 \
-    { CID_BASIC    ,  { ATTRID_BASIC_ZCL_VERSION       , ZCL_UINT8          , R  , (void *)&zclWaterControl_ZCLVersion                      } },    \
-    { CID_BASIC    ,  { ATTRID_BASIC_APPL_VERSION      , ZCL_UINT8          , R  , (void *)&zclWaterControl_ApplicationVersion              } },    \
-    { CID_BASIC    ,  { ATTRID_BASIC_STACK_VERSION     , ZCL_UINT8          , R  , (void *)&zclWaterControl_StackVersion                    } },    \
-    { CID_BASIC    ,  { ATTRID_BASIC_HW_VERSION        , ZCL_UINT8          , R  , (void *)&zclWaterControl_HWRevision                      } },    \
-    { CID_BASIC    ,  { ATTRID_BASIC_MANUFACTURER_NAME , ZCL_CHAR_STR       , R  , (void *)zclWaterControl_ManufacturerName                 } },    \
-    { CID_BASIC    ,  { ATTRID_BASIC_MODEL_ID          , ZCL_CHAR_STR       , R  , (void *)zclWaterControl_ModelId                          } },    \
-    { CID_BASIC    ,  { ATTRID_BASIC_DATE_CODE         , ZCL_CHAR_STR       , R  , (void *)zclWaterControl_DateCode                         } },    \
-    { CID_BASIC    ,  { ATTRID_BASIC_POWER_SOURCE      , ZCL_ENUM8          , R  , (void *)&zclWaterControl_PowerSource                     } },    \
-    { CID_BASIC    ,  { ATTRID_BASIC_SW_BUILD_ID       , ZCL_CHAR_STR       , R  , (void *)zclWaterControl_DateCode                         } },    \
-    { CID_BASIC    ,  { ATTRID_CLUSTER_REVISION        , ZCL_UINT16         , R  , (void *)&zclWaterControl_clusterRevision_all             } },    \
-    { CID_ON_OFF   ,  { ATTRID_ON_OFF                  , ZCL_BOOLEAN        , RR , (void *)&(zcl_Configs[INDEX].Config.RelayState)          } },    \
-    { CID_METERING ,  { ATTRID_CURRENT_SUMM_DELIVERED  , ZCL_UINT48         , RW , (void *)&zcl_Configs[INDEX].Config.CurrentSummDelivered  } },    \
-    { CID_METERING ,  { ATTRID_STATUS                  , ZCL_BITMAP8        , R  , (void *)&zcl_Configs[INDEX].Config.Status                } },    \
-    { CID_METERING ,  { ATTRID_UNIT_OF_MEASURE         , ZCL_ENUM8          , R  , (void *)&zclWaterControl_UnitofMeasure                   } },    \
-    { CID_METERING ,  { ATTRID_MULTIPLIER              , ZCL_UINT24         , RW , (void *)&zcl_Configs[INDEX].Config.Multiplier            } },    \
-    { CID_METERING ,  { ATTRID_DIVISOR                 , ZCL_UINT24         , RW , (void *)&zcl_Configs[INDEX].Config.Divisor               } },    \
-    { CID_METERING ,  { ATTRID_SUMM_FORMATTING         , ZCL_BITMAP8        , R  , (void *)&zcl_Configs[INDEX].Config.SummFormatting        } },    \
-    { CID_METERING ,  { ATTRID_METERING_DEVICE_TYPE    , ZCL_BITMAP8        , R  , (void *)&zclWaterControl_MeteringDeviceType              } },    \
-  }                                                                                                                                                 \
-
+const cId_t zclEndpoint_InClusterList[]                       = { CID_BASIC, CID_GROUPS, CID_ON_OFF };
+const cId_t zclEndpoint_OutClusterList[]                      = { CID_METERING };
 CONST zclAttrRec_t zclEndpoints_Attrs[][ENDPOINT_ATTRS_COUNT] = { ZCL_ENDPOINT_ATTRS(0), ZCL_ENDPOINT_ATTRS(1) };
 
 #define APP_MAX_INCLUSTERS   (sizeof(zclEndpoint_InClusterList) / sizeof(zclEndpoint_InClusterList[0]))
@@ -104,7 +84,7 @@ void zclWaterControl_ResetAttributesToDefaultValues ( app_config_t *config ) {
   config->Config.SummFormatting = DEFAULT_SUMM_FORMATTING;
   config->Config.RelayState     = DEFAULT_RELAY_STATE;
   
-  for ( uint8 i = 0; i < 6; ++i ) {
+  for ( uint8 i = 0; i < sizeof(uint48); ++i ) {
     config->Config.CurrentSummDelivered.data[i] = 0;
   }
 }

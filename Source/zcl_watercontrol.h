@@ -64,6 +64,28 @@ extern "C"
 #define DECLARE_BASIC_RESETCB(INDEX)         static void zclWaterControl_BasicResetCB_EP##INDEX (void ){ zclWaterControl_BasicResetCB ( &zcl_Configs[INDEX] ); }
 #define DECLARE_ON_OFFCB(INDEX)              static void zclWaterControl_OnOffCB_EP##INDEX (uint8 cmd ){ zclWaterControl_OnOffCB ( &zcl_Configs[INDEX], cmd ); }
 #define GET_FUNC(NAME, INDEX)                NAME## _EP ##INDEX
+   
+#define ZCL_ENDPOINT_ATTRS(INDEX)                                                                                                                   \
+  {                                                                                                                                                 \
+    { CID_BASIC    ,  { ATTRID_BASIC_ZCL_VERSION       , ZCL_UINT8          , R  , (void *)&zclWaterControl_ZCLVersion                      } },    \
+    { CID_BASIC    ,  { ATTRID_BASIC_APPL_VERSION      , ZCL_UINT8          , R  , (void *)&zclWaterControl_ApplicationVersion              } },    \
+    { CID_BASIC    ,  { ATTRID_BASIC_STACK_VERSION     , ZCL_UINT8          , R  , (void *)&zclWaterControl_StackVersion                    } },    \
+    { CID_BASIC    ,  { ATTRID_BASIC_HW_VERSION        , ZCL_UINT8          , R  , (void *)&zclWaterControl_HWRevision                      } },    \
+    { CID_BASIC    ,  { ATTRID_BASIC_MANUFACTURER_NAME , ZCL_CHAR_STR       , R  , (void *)zclWaterControl_ManufacturerName                 } },    \
+    { CID_BASIC    ,  { ATTRID_BASIC_MODEL_ID          , ZCL_CHAR_STR       , R  , (void *)zclWaterControl_ModelId                          } },    \
+    { CID_BASIC    ,  { ATTRID_BASIC_DATE_CODE         , ZCL_CHAR_STR       , R  , (void *)zclWaterControl_DateCode                         } },    \
+    { CID_BASIC    ,  { ATTRID_BASIC_POWER_SOURCE      , ZCL_ENUM8          , R  , (void *)&zclWaterControl_PowerSource                     } },    \
+    { CID_BASIC    ,  { ATTRID_BASIC_SW_BUILD_ID       , ZCL_CHAR_STR       , R  , (void *)zclWaterControl_DateCode                         } },    \
+    { CID_BASIC    ,  { ATTRID_CLUSTER_REVISION        , ZCL_UINT16         , R  , (void *)&zclWaterControl_clusterRevision_all             } },    \
+    { CID_ON_OFF   ,  { ATTRID_ON_OFF                  , ZCL_BOOLEAN        , RR , (void *)&(zcl_Configs[INDEX].Config.RelayState)          } },    \
+    { CID_METERING ,  { ATTRID_CURRENT_SUMM_DELIVERED  , ZCL_UINT48         , RW , (void *)&zcl_Configs[INDEX].Config.CurrentSummDelivered  } },    \
+    { CID_METERING ,  { ATTRID_STATUS                  , ZCL_BITMAP8        , R  , (void *)&zcl_Configs[INDEX].Config.Status                } },    \
+    { CID_METERING ,  { ATTRID_UNIT_OF_MEASURE         , ZCL_ENUM8          , R  , (void *)&zclWaterControl_UnitofMeasure                   } },    \
+    { CID_METERING ,  { ATTRID_MULTIPLIER              , ZCL_UINT24         , RW , (void *)&zcl_Configs[INDEX].Config.Multiplier            } },    \
+    { CID_METERING ,  { ATTRID_DIVISOR                 , ZCL_UINT24         , RW , (void *)&zcl_Configs[INDEX].Config.Divisor               } },    \
+    { CID_METERING ,  { ATTRID_SUMM_FORMATTING         , ZCL_BITMAP8        , R  , (void *)&zcl_Configs[INDEX].Config.SummFormatting        } },    \
+    { CID_METERING ,  { ATTRID_METERING_DEVICE_TYPE    , ZCL_BITMAP8        , R  , (void *)&zclWaterControl_MeteringDeviceType              } },    \
+  }                                                                                                                                                 \
 /*********************************************************************
  * TYPEDEFS
  */
@@ -111,7 +133,7 @@ typedef struct {
 
 /*Relay status: 0 - OFF, 1 - ON */
   uint8  RelayState;
-} endpoint_config_t;
+} endpoint_config_t;//TODO: rename to endpoint_data_t
 
 typedef struct {
   endpoint_config_t Config;
@@ -120,14 +142,14 @@ typedef struct {
   uint8             Endpoint;
   bool              ReportCurrentSummDelivered;
   void (*ApplyRelay) (uint8);
-} app_config_t;
+} app_config_t;//TODO: : rename to endpoint_config_t
      
 /*********************************************************************
  * VARIABLES
  */
 
 extern const uint8               zcl_EndpointsCount;
-extern app_config_t              zcl_Configs[ENDPOINTS_COUNT];
+extern app_config_t              zcl_Configs[ENDPOINTS_COUNT]; //TODO: rename zcl_EndpointConfigs
 
 extern SimpleDescriptionFormat_t zclEndpoints[];
 extern CONST zclAttrRec_t        zclEndpoints_Attrs[][ENDPOINT_ATTRS_COUNT];
