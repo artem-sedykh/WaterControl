@@ -1,6 +1,6 @@
 #include "factory_reset.h"
 #include "AF.h"
-#include "Debug.h"
+#include "debug.h"
 #include "OnBoard.h"
 #include "bdb.h"
 #include "bdb_interface.h"

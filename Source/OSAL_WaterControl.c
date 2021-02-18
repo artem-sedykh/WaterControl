@@ -14,7 +14,7 @@
 
 #include "commissioning.h"
 #include "factory_reset.h"
-#include "Debug.h"
+#include "debug.h"
 
 #include "bdb_interface.h"
 #include "zcl_watercontrol.h"

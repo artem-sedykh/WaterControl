@@ -1,5 +1,5 @@
 #include "commissioning.h"
-#include "Debug.h"
+#include "debug.h"
 #include "OSAL_PwrMgr.h"
 #include "ZDApp.h"
 #include "bdb_interface.h"
