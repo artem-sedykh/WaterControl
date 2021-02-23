@@ -3516,7 +3516,7 @@
                 <name>$PROJ_DIR$\..\..\..\..\..\Components\hal\common\hal_assert.c</name>
             </file>
             <file>
-                <name>$PROJ_DIR$\..\..\..\..\..\Components\hal\common\hal_drivers.c</name>
+                <name>$PROJ_DIR$\..\lib\hal_drivers.c</name>
             </file>
         </group>
         <group>
@@ -3629,6 +3629,12 @@
         </file>
         <file>
             <name>$PROJ_DIR$\..\lib\factory_reset.h</name>
+        </file>
+        <file>
+            <name>$PROJ_DIR$\..\lib\hal_counter.c</name>
+        </file>
+        <file>
+            <name>$PROJ_DIR$\..\lib\hal_counter.h</name>
         </file>
         <file>
             <name>$PROJ_DIR$\..\lib\hal_key.c</name>
@@ -4105,7 +4111,7 @@
             <name>$PROJ_DIR$\..\..\..\ZMain\TI2530DB\chipcon_cstartup.s51</name>
         </file>
         <file>
-            <name>$PROJ_DIR$\..\..\..\ZMain\TI2530DB\OnBoard.c</name>
+            <name>$PROJ_DIR$\..\lib\OnBoard.c</name>
         </file>
         <file>
             <name>$PROJ_DIR$\..\..\..\ZMain\TI2530DB\OnBoard.h</name>

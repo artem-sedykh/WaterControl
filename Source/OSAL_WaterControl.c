@@ -15,6 +15,7 @@
 #include "commissioning.h"
 #include "factory_reset.h"
 #include "debug.h"
+#include "hal_counter.h"
 
 #include "bdb_interface.h"
 #include "zcl_watercontrol.h"
@@ -29,6 +30,9 @@ const pTaskEventHandlerFn tasksArr[] = {macEventLoop,
                                         ZDApp_event_loop,
                                         zcl_event_loop,
                                         bdb_event_loop,
+#if (defined HAL_COUNTER) && (HAL_COUNTER == TRUE)
+                                        zclCounter_event_loop,
+#endif
                                         zclWaterControl_event_loop,
                                         zclCommissioning_event_loop,
                                         zclFactoryResetter_loop};
@@ -52,6 +56,9 @@ void osalInitTasks(void) {
     ZDApp_Init(taskID++);
     zcl_Init(taskID++);
     bdb_Init(taskID++);
+#if (defined HAL_COUNTER) && (HAL_COUNTER == TRUE)
+    zclCounter_Init(taskID++);
+#endif
     zclWaterControl_Init(taskID++);
     zclCommissioning_Init(taskID++);
     zclFactoryResetter_Init(taskID++);

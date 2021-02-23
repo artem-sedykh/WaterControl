@@ -33,6 +33,7 @@
 #include "hal_key.h"
 #include "version.h"
 #include "uint48.h"
+#include "hal_counter.h"
 
 /*********************************************************************
 * CONSTANTS
@@ -74,6 +75,7 @@ static void      zclWaterControl_Increment         ( app_config_t *config );
 static void      zclWaterControl_Report            ( void );
 
 static void      zclWaterControl_HandleKeys        ( byte portAndAction, byte keyCode );
+static void      zclWaterControl_HandleCounters    ( uint8 port, uint8 pin, bool state );
 
 DECLARE_BASIC_RESETCB(0) //zclWaterControl_BasicResetCB_EP0
 DECLARE_BASIC_RESETCB(1) //zclWaterControl_BasicResetCB_EP1
@@ -86,8 +88,7 @@ static zclGeneral_AppCallbacks_t zclEndpoint_CmdCallbacks[ENDPOINTS_COUNT]  = {
   { GET_FUNC(zclWaterControl_BasicResetCB, 1), NULL, GET_FUNC(zclWaterControl_OnOffCB, 1), NULL, NULL, NULL, NULL, NULL },
 };
 
-void zclWaterControl_Init( byte task_id ) {
-  
+void zclWaterControl_Init ( byte task_id ) {
   HalLedSet(HAL_LED_ALL, HAL_LED_MODE_BLINK);
   
   zclWaterControl_TaskID = task_id;
@@ -114,6 +115,8 @@ void zclWaterControl_Init( byte task_id ) {
   
   RegisterForKeys( zclWaterControl_TaskID );
   
+  RegisterForCounters ( zclWaterControl_TaskID );
+  
   LREP("Build %s \r\n", zclWaterControl_DateCodeNT);
   
   osal_start_reload_timer ( zclWaterControl_TaskID, APP_REPORT_EVT, APP_REPORT_DELAY );
@@ -122,12 +125,15 @@ void zclWaterControl_Init( byte task_id ) {
   osal_start_reload_timer ( zclWaterControl_TaskID, APP_SAVE_ATTRS_EVT, APP_SAVE_ATTRS_DELAY );
 }
 
-uint16 zclWaterControl_event_loop( uint8 task_id, uint16 events ) {
+uint16 zclWaterControl_event_loop ( uint8 task_id, uint16 events ) {
   if (events & SYS_EVENT_MSG) {
     afIncomingMSGPacket_t *MSGpkt;
     while ((MSGpkt = (afIncomingMSGPacket_t *)osal_msg_receive(zclWaterControl_TaskID))) {
       LREP("MSGpkt->hdr.event 0x%X clusterId=0x%X\r\n", MSGpkt->hdr.event, MSGpkt->clusterId);
       switch (MSGpkt->hdr.event) {
+        case COUNTER_CHANGE:
+          zclWaterControl_HandleCounters ( ((counterChange_t *)MSGpkt)->port,  ((counterChange_t *)MSGpkt)->pin, ((counterChange_t *)MSGpkt)->state );
+          break;
         case KEY_CHANGE:
           zclWaterControl_HandleKeys ( ((keyChange_t *)MSGpkt)->state, ((keyChange_t *)MSGpkt)->keys );
           break;
@@ -153,36 +159,34 @@ uint16 zclWaterControl_event_loop( uint8 task_id, uint16 events ) {
   }
 
   if (events & APP_SAVE_ATTRS_EVT) {
-      zclWaterControl_SaveAttributes();
-      return (events ^ APP_SAVE_ATTRS_EVT);
+    zclWaterControl_SaveAttributes();
+    return (events ^ APP_SAVE_ATTRS_EVT);
   }
   
   if (events & APP_PUSH_STATE_EVT) {
-      LREPMaster("[event_loop]: received APP_PUSH_STATE_EVT\r\n");
-      zclWaterControl_PushState ();
-      return (events ^ APP_PUSH_STATE_EVT);
+    LREPMaster("[event_loop]: received APP_PUSH_STATE_EVT\r\n");
+    zclWaterControl_PushState ();
+    return (events ^ APP_PUSH_STATE_EVT);
   }
-  
+
   return 0;
 }
 
-static void zclWaterControl_HandleKeys ( byte portAndAction, byte keyCode ) {
-  uint8 key_pressed = HAL_IS_KEY_PRESSED(portAndAction);
-  uint8 port = HAL_CLEAR_KEY_PRESSED_BIT(portAndAction);
-  LREP("port: %d, key: %d, key_pressed: %d  \r\n", port, keyCode, key_pressed);
+static void zclWaterControl_HandleCounters ( uint8 port, uint8 pin, bool state ) {
+  LREP("[zclWaterControl_HandleCounters]: port: P%d_%d\r\n", port, pin);
 
-  if ( key_pressed == FALSE) {
-    for ( uint8 i = 0; i < zcl_EndpointsCount; i++ ) {
-      if ( zcl_Configs[i].Counter.Port == port && zcl_Configs[i].Counter.Key == keyCode ) {
-        zclWaterControl_Increment ( &zcl_Configs[i] );
-      }
+  for ( uint8 i = 0; i < zcl_EndpointsCount; i++ ) {
+    if ( zcl_Configs[i].Counter.Port == port && zcl_Configs[i].Counter.Pin == pin ) {
+      // TODO: FIX IT!
+      // zclWaterControl_Increment ( &zcl_Configs[i] );
     }
   }
-  
-  if ( port == HAL_RESET_BUTTON_KEY_PORT && keyCode == HAL_RESET_BUTTON_SBIT ) {
-    zclFactoryResetter_HandleKeys ( port, keyCode, key_pressed );
-    zclCommissioning_HandleKeys ( port, keyCode, key_pressed );
-  }
+}
+
+static void zclWaterControl_HandleKeys ( byte portAndAction, byte keyCode ) {
+  LREP("[zclWaterControl_HandleKeys] portAndAction=0x%X keyCode=0x%X\r\n", portAndAction, keyCode);
+  zclFactoryResetter_HandleKeys ( portAndAction, keyCode );
+  zclCommissioning_HandleKeys ( portAndAction, keyCode );
 }
 
 static void zclWaterControl_BasicResetCB ( app_config_t *config ) {

@@ -51,82 +51,47 @@
  */
 
 #if defined (HAL_BOARD_CHDTECH_DEV)
-  #define HAL_NUM_LEDS            3
+  
 #elif defined(HAL_BOARD_TARGET)
   #define HAL_NUM_LEDS            1
 #else
   #error Unknown Board Indentifier
 #endif
 
+
 #define HAL_LED_BLINK_DELAY()   st( { volatile uint32 i; for (i=0; i<0x5800; i++) { }; } )
 
-#if defined(HAL_BOARD_TARGET)
-  #define LED1_BV           BV(1)
-  #define LED1_SBIT         P0_1
-  #define LED1_DDR          P0DIR
-  #define LED1_POLARITY     ACTIVE_HIGH
+#define HAL_NUM_LEDS            1
 
-  #define LED2_BV           BV(4)
-  #define LED2_SBIT         P0_4
-  #define LED2_DDR          P0DIR
-  #define LED2_POLARITY     ACTIVE_HIGH
+#define LED1_BV                 BV(4)
+#define LED1_SBIT               P1_4
+#define LED1_DDR                P1DIR
+#define LED1_POLARITY           ACTIVE_LOW
 
-  #define LED3_BV           BV(5)
-  #define LED3_SBIT         P0_5
-  #define LED3_DDR          P0DIR
-  #define LED3_POLARITY     ACTIVE_HIGH
+#define LED2_BV                 BV(4)
+#define LED2_SBIT               P1_4
+#define LED2_DDR                P1DIR
+#define LED2_POLARITY           ACTIVE_LOW
 
+#define LED3_BV                 BV(4)
+#define LED3_SBIT               P1_4
+#define LED3_DDR                P1DIR
+#define LED3_POLARITY           ACTIVE_LOW
 
-  #define LED4_BV           BV(4)
-  #define LED4_SBIT         P1_4
-  #define LED4_DDR          P1DIR
-  #define LED4_POLARITY     ACTIVE_HIGH
+#define LED4_BV                 BV(4)
+#define LED4_SBIT               P1_4
+#define LED4_DDR                P1DIR
+#define LED4_POLARITY           ACTIVE_LOW
 
-  #define RELAY1_BV           BV(4)
-  #define RELAY1_SBIT         P0_4
-  #define RELAY1_OUT_BV       BV(5)
-  #define RELAY1_DDR          P0DIR
+#define RELAY1_BV           BV(2)
+#define RELAY1_SBIT         P1_2
+#define RELAY1_DDR          P1DIR
 
-  #define RELAY_POLARITY      ACTIVE_LOW
+#define RELAY_POLARITY      ACTIVE_LOW
 
-  #define RELAY2_BV           BV(6)
-  #define RELAY2_SBIT         P0_6
-  #define RELAY2_OUT_SBIT     P0_7
-  #define RELAY2_DDR          P0DIR
-#elif defined(HAL_BOARD_CHDTECH_DEV)
-  #define LED1_BV           BV(0)
-  #define LED1_SBIT         P1_0
-  #define LED1_DDR          P1DIR
-  #define LED1_POLARITY     ACTIVE_LOW
-
-  #define LED2_BV           BV(1)
-  #define LED2_SBIT         P1_1
-  #define LED2_DDR          P1DIR
-  #define LED2_POLARITY     ACTIVE_LOW
-
-  #define LED3_BV           BV(4)
-  #define LED3_SBIT         P1_4
-  #define LED3_DDR          P1DIR
-  #define LED3_POLARITY     ACTIVE_LOW
-
-
-  #define LED4_BV           BV(4)
-  #define LED4_SBIT         P1_4
-  #define LED4_DDR          P1DIR
-  #define LED4_POLARITY     ACTIVE_LOW
-
-  #define RELAY1_BV           BV(4)
-  #define RELAY1_SBIT         P0_4
-  #define RELAY1_DDR          P0DIR
-
-  #define RELAY_POLARITY      ACTIVE_LOW
-
-  #define RELAY2_BV           BV(6)
-  #define RELAY2_SBIT         P0_6
-  #define RELAY2_DDR          P0DIR
-#endif
-
-
+#define RELAY2_BV           BV(3)
+#define RELAY2_SBIT         P1_3
+#define RELAY2_DDR          P1DIR
 
 /* ------------------------------------------------------------------------------------------------
  *                                    Push Button Configuration

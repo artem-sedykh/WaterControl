@@ -4,6 +4,7 @@
 #include "version.h"
 #include "hal_board.h"
 #include "hal_key.h"
+#include "hal_counter.h"
 
 #define APP_DEVICE_VERSION      1
 #define APP_FLAGS               0
@@ -44,8 +45,8 @@ const uint8  zclWaterControl_UnitofMeasure       = 1;  //m3 (Cubic Meter) & m3/h
 const uint8  zcl_EndpointsCount                  = ENDPOINTS_COUNT;
 
 app_config_t zcl_Configs[ENDPOINTS_COUNT] = {
-  { { {0, 0, 0, 0, 0, 0}, DEFAULT_DIVISOR, DEFAULT_MULTIPLIER, DEFAULT_STATUS, DEFAULT_SUMM_FORMATTING, DEFAULT_RELAY_STATE }, FALSE, NW_HOT_CONFIG , 1, TRUE, GET_FUNC(ApplyRelay, 0), { HAL_HOT_KEY_PORT , HAL_HOT_COUNTER_SBIT } },
-  { { {0, 0, 0, 0, 0, 0}, DEFAULT_DIVISOR, DEFAULT_MULTIPLIER, DEFAULT_STATUS, DEFAULT_SUMM_FORMATTING, DEFAULT_RELAY_STATE }, FALSE, NW_COLD_CONFIG, 2, TRUE, GET_FUNC(ApplyRelay, 1), { HAL_COLD_KEY_PORT, HAL_COLD_COUNTER_SBIT } }
+  { { {0, 0, 0, 0, 0, 0}, DEFAULT_DIVISOR, DEFAULT_MULTIPLIER, DEFAULT_STATUS, DEFAULT_SUMM_FORMATTING, DEFAULT_RELAY_STATE }, FALSE, NW_HOT_CONFIG , 1, TRUE, GET_FUNC(ApplyRelay, 0), { HAL_HOT_COUNTER_PORT_NUMBER , HAL_HOT_COUNTER_PIN_NUMBER  } },
+  { { {0, 0, 0, 0, 0, 0}, DEFAULT_DIVISOR, DEFAULT_MULTIPLIER, DEFAULT_STATUS, DEFAULT_SUMM_FORMATTING, DEFAULT_RELAY_STATE }, FALSE, NW_COLD_CONFIG, 2, TRUE, GET_FUNC(ApplyRelay, 1), { HAL_COLD_COUNTER_PORT_NUMBER, HAL_COLD_COUNTER_PIN_NUMBER } }
 };
 
 const cId_t zclEndpoint_InClusterList[]                       = { CID_BASIC, CID_GROUPS, CID_ON_OFF };
@@ -60,12 +61,8 @@ SimpleDescriptionFormat_t zclEndpoints[ENDPOINTS_COUNT];
 uint8 const zclEndpoint_AttrsCount = ENDPOINT_ATTRS_COUNT;
 
 void zclWaterControl_InitClusters ( void ) {
-  uint8 i = 0;
-
-  for (i = 0; i < zcl_EndpointsCount; ++i) {
-    uint8 endpoint = i + 1;
-
-    zclEndpoints[i].EndPoint           = endpoint;
+  for ( uint8 i = 0; i < zcl_EndpointsCount; ++i) {
+    zclEndpoints[i].EndPoint           = i + 1;
     zclEndpoints[i].AppProfId          = ZCL_HA_PROFILE_ID;
     zclEndpoints[i].AppDeviceId        = ZCL_HA_DEVICEID_ON_OFF_SWITCH;
     zclEndpoints[i].AppDevVer          = APP_DEVICE_VERSION;

@@ -54,16 +54,16 @@ void zclFactoryResetter_ResetToFN(void) {
     bdb_resetLocalAction();
 }
 
-void zclFactoryResetter_HandleKeys(uint8 port, uint8 keyCode, bool key_pressed) {
+void zclFactoryResetter_HandleKeys(uint8 portAndAction, uint8 keyCode) {
 #if FACTORY_RESET_BY_LONG_PRESS
-    if (key_pressed) {
+    if (portAndAction & HAL_KEY_RELEASE) {
         LREPMaster("zclFactoryResetter: Key release\r\n");
         osal_stop_timerEx(zclFactoryResetter_TaskID, FACTORY_RESET_EVT);
     } else {
         LREPMaster("zclFactoryResetter: Key press\r\n");
         bool statTimer = true;
 #if FACTORY_RESET_BY_LONG_PRESS_PORT
-        statTimer = FACTORY_RESET_BY_LONG_PRESS_PORT & port;
+        statTimer = FACTORY_RESET_BY_LONG_PRESS_PORT & portAndAction;
 #endif
         LREP("zclFactoryResetter statTimer hold timer %d\r\n", statTimer);
         if (statTimer) {

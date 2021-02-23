@@ -66,30 +66,34 @@ static uint8 registeredCountersTaskID = NO_TASK_ID;
  **************************************************************************************************/
 void halProcessCounterInterrupt ( uint8 portNum );
 
-uint8 SendCounterState ( uint8 portNumber, uint8 pinNumber, bool state );
+uint8 counter_state_send ( uint8 portNumber, uint8 pinNumber, bool state );
 
 void zclCounter_Init ( uint8 task_id ) {
   TaskID = task_id;
 }
 
-uint8 RegisterForCounters ( uint8 task_id ) {
-  if ( registeredCountersTaskID == NO_TASK_ID ) {
-    registeredCountersTaskID = task_id;
-    return ( true );
-  }
-  else {
-    return ( false );
-  }
-}
-
-void HalCounterConfig ( void ) {
+void HalCounterInit ( void ) {
 #if HAL_COUNTER_P0_INPUT_PINS
   P0SEL &= ~HAL_COUNTER_P0_INPUT_PINS;
   P0DIR &= ~(HAL_COUNTER_P0_INPUT_PINS);
-  
-  P0IEN |= HAL_COUTER_P0_INPUT_PINS;
+#endif
+
+#if HAL_COUNTER_P1_INPUT_PINS
+  P1SEL &= ~HAL_COUNTER_P1_INPUT_PINS;
+  P1DIR &= ~(HAL_COUNTER_P1_INPUT_PINS);
+#endif
+
+#if HAL_COUNTER_P2_INPUT_PINS
+  P2SEL &= ~(HAL_COUNTER_P2_INPUT_PINS);
+  P2DIR &= ~(HAL_COUNTER_P2_INPUT_PINS);
+#endif
+}
+
+void HalCounterConfig ( void ) {
+#if HAL_COUNTER_P0_INPUT_PINS 
+  P0IEN |= HAL_COUNTER_P0_INPUT_PINS;
   IEN1 |= HAL_COUNTER_BIT5;            // enable port0 int
-  P0INP &= ~HAL_COUTER_P0_INPUT_PINS; // Pullup/pulldown
+  P0INP &= ~HAL_COUNTER_P0_INPUT_PINS; // Pullup/pulldown
 
 #if (HAL_COUNTER_P0_INPUT_PINS_EDGE == HAL_COUNTER_FALLING_EDGE)
   P2INP &= ~HAL_COUNTER_BIT5; // pull up
@@ -104,9 +108,6 @@ void HalCounterConfig ( void ) {
 #endif
 
 #if HAL_COUNTER_P1_INPUT_PINS
-  P1SEL &= ~HAL_COUNTER_P1_INPUT_PINS;
-  P1DIR &= ~(HAL_COUNTER_P1_INPUT_PINS);
-  
   P1IEN |= HAL_COUNTER_P1_INPUT_PINS;
   IEN2 |= HAL_COUNTER_BIT4; // enable port1 int
   P1INP &= ~HAL_COUNTER_P1_INPUT_PINS; //Pullup/pulldown 
@@ -142,6 +143,16 @@ void HalCounterConfig ( void ) {
 #endif
 }
 
+uint8 RegisterForCounters ( uint8 task_id ) {
+  if ( registeredCountersTaskID == NO_TASK_ID ) {
+    registeredCountersTaskID = task_id;
+    return ( true );
+  }
+  else {
+    return ( false );
+  }
+}
+
 void halProcessCounterInterrupt ( uint8 portNumber ) {
   uint16 event_id = 0;
   uint8 enabledPins;
@@ -167,8 +178,8 @@ void halProcessCounterInterrupt ( uint8 portNumber ) {
       return;
   }
   
-  for (uint8 i = 0; i < 8; i++) {
-    uint8 pinNumber = 1 << i;
+  for (uint8 pinIndex = 0; pinIndex < 8; pinIndex++) {
+    uint8 pinNumber = 1 << pinIndex;
     
     if ( (enabledPins & pinNumber) && (PNIFG & pinNumber) ) {
       osal_start_timerEx ( TaskID, event_id | pinNumber, HAL_COUNTER_DEBOUNCE_VALUE );
@@ -180,42 +191,49 @@ uint16 zclCounter_event_loop ( uint8 task_id, UINT16 events ) {
   uint8 PINS_EDGE;
   uint8 PN;
   uint8 enabledPins;
-  bool isPressed = false;
-  uint8 portNumber = (events >> 8);
-  uint8 pinsNumber = events & ~(portNumber << 8);
+  uint8 portsNumber = (events >> 8);
+  LREP("[zclCounter_event_loop]: events: %d\r\n", events);
   
-  switch ( portNumber ) {
-    case HAL_COUNTER_PORT0:
-      enabledPins = HAL_COUNTER_P0_INPUT_PINS;
-      PINS_EDGE = HAL_COUNTER_P0_INPUT_PINS_EDGE;
-      PN = P0;
-      break;
-    case HAL_COUNTER_PORT1:
-      enabledPins = HAL_COUNTER_P1_INPUT_PINS;
-      PINS_EDGE = HAL_COUNTER_P1_INPUT_PINS_EDGE;
-      PN = P1;
-      break;
-    case HAL_COUNTER_PORT2:
-      enabledPins = HAL_COUNTER_P2_INPUT_PINS;
-      PINS_EDGE = HAL_COUNTER_P2_INPUT_PINS_EDGE;
-      PN = P2;
-      break;
-    default:
-      return 0;
-  }
-  
-  for (uint8 i = 0; i < 8; i++) {
-    uint8 pinNumber = 1 << i;
-    if ( (enabledPins & pinNumber) && (pinsNumber & pinNumber) ) {
-      isPressed = PINS_EDGE != !!(PN & pinNumber);
-      SendCounterState ( portNumber, pinNumber, isPressed );
+  for (uint8 portIndex = 0; portIndex < 3; portIndex++) {
+    uint8 portNumber = 1 << portIndex;
+
+    if ( (portsNumber &  portNumber) ) {
+      uint8 pinsNumber = events & ~(portNumber << 8);
+
+      switch ( portIndex ) {
+        case 0:
+          enabledPins = HAL_COUNTER_P0_INPUT_PINS;
+          PINS_EDGE = HAL_COUNTER_P0_INPUT_PINS_EDGE;
+          PN = P0;
+          break;
+        case 1:
+          enabledPins = HAL_COUNTER_P1_INPUT_PINS;
+          PINS_EDGE = HAL_COUNTER_P1_INPUT_PINS_EDGE;
+          PN = P1;
+          break;
+        case 2:
+          enabledPins = HAL_COUNTER_P2_INPUT_PINS;
+          PINS_EDGE = HAL_COUNTER_P2_INPUT_PINS_EDGE;
+          PN = P2;
+          break;
+        default:
+          continue;
+      }
+
+      for (uint8 pinIndex = 0; pinIndex < 8; pinIndex++) {
+        uint8 pinNumber = 1 << pinIndex;
+        if ( (enabledPins & pinNumber) && (pinsNumber & pinNumber) ) {
+          bool isPressed = PINS_EDGE != !!(PN & pinNumber);
+          counter_state_send ( portIndex, pinIndex, isPressed );
+        }
+      }
     }
   }
-  
+
   return 0;
 }
 
-uint8 SendCounterState ( uint8 portNumber, uint8 pinNumber, bool state ) { 
+uint8 counter_state_send ( uint8 port, uint8 pin, bool state ) { 
   if ( registeredCountersTaskID == NO_TASK_ID ) {
     return ( ZFailure );
   }
@@ -227,8 +245,8 @@ uint8 SendCounterState ( uint8 portNumber, uint8 pinNumber, bool state ) {
   {
     msgPtr->hdr.event = COUNTER_CHANGE;
     msgPtr->state = state;
-    msgPtr->port = portNumber;
-    msgPtr->pin = pinNumber;
+    msgPtr->port = port;
+    msgPtr->pin = pin;
 
     osal_msg_send( registeredCountersTaskID, (uint8 *)msgPtr );
   }

@@ -188,8 +188,8 @@ static void zclCommissioning_BindNotification(bdbBindNotificationData_t *data) {
     LREP("bindCapacity %d %usedEntries %d \r\n", maxEntries, usedEntries);
 }
 
-void zclCommissioning_HandleKeys(uint8 port, uint8 keyCode, bool key_pressed) {
-  if (key_pressed) {
+void zclCommissioning_HandleKeys(uint8 portAndAction, uint8 keyCode) {
+    if (portAndAction & HAL_KEY_PRESS) {
 #if ZG_BUILD_ENDDEVICE_TYPE
         if (devState == DEV_NWK_ORPHAN) {
             LREP("devState=%d try to restore network\r\n", devState);
@@ -197,7 +197,7 @@ void zclCommissioning_HandleKeys(uint8 port, uint8 keyCode, bool key_pressed) {
         }
 #endif
     }
-#if defined(POWER_SAVING)
+    #if defined(POWER_SAVING)
         NLME_SetPollRate(1);
-#endif
+    #endif
 }

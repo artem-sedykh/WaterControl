@@ -20,10 +20,6 @@ extern "C"
  *                                            CONSTANTS
  **************************************************************************************************/
 #define COUNTER_CHANGE                      0xCA
-  
-//#define HAL_COUNTER_EVENT2                  0x0400
-//#define HAL_COUNTER_EVENT1                  0x0200
-//#define HAL_COUNTER_EVENT0                  0x0100
 
 #define HAL_COUNTER_BIT0   0x01
 #define HAL_COUNTER_BIT1   0x02
@@ -44,8 +40,6 @@ extern "C"
 /**************************************************************************************************
  * TYPEDEFS
  **************************************************************************************************/
-//typedef void (*halCounterCBack_t)( uint8 portNumber, uint8 pinNumber, bool isPressed );
-
 typedef struct
 {
   osal_event_hdr_t hdr;
@@ -66,6 +60,8 @@ typedef struct
  * Initialize the Counter Service
  */
 extern void zclCounter_Init ( uint8 task_id );
+
+extern void HalCounterInit ( void );
 
 extern void HalCounterConfig ( void );
 

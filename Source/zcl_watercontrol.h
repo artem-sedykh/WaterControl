@@ -137,7 +137,7 @@ typedef struct {
 
 typedef struct {
   uint8 Port;
-  uint8 Key;
+  uint8 Pin;
 } counter_config_t;
 typedef struct {
   endpoint_config_t Config;
