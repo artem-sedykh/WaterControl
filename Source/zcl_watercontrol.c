@@ -177,8 +177,7 @@ static void zclWaterControl_HandleCounters ( uint8 port, uint8 pin, bool state )
 
   for ( uint8 i = 0; i < zcl_EndpointsCount; i++ ) {
     if ( zcl_Configs[i].Counter.Port == port && zcl_Configs[i].Counter.Pin == pin ) {
-      // TODO: FIX IT!
-      // zclWaterControl_Increment ( &zcl_Configs[i] );
+      zclWaterControl_Increment ( &zcl_Configs[i] );
     }
   }
 }
