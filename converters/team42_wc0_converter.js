@@ -147,20 +147,20 @@ const fz = {
 };
 
 const device = {
-    zigbeeModel: ['WC04'],
-    model: 'WC04',
+    zigbeeModel: ['IC04'],
+    model: 'IC04',
     vendor: 'Team42',
-    description: '[TODO write description)',
+    description: '[TODO: write description]',
     supports: '',
     fromZigbee: [fromZigbeeConverters.on_off, fz.metering],
     toZigbee: [toZigbeeConverters.on_off, tz.metering],
     endpoint: (device) => {
-        return {'l1': 1, 'l2': 2, 'l3': 3, 'l4': 4};
+        return {l1: 1, l2: 2, l3: 3, l4: 4};
     },
     meta: {configureKey: 1, multiEndpoint: true},
     configure: async (device, coordinatorEndpoint) => {
-        for (let i = 0; i < 4; ++i ) {
-            const endpoint = device.getEndpoint(i+1);
+        for (let index = 1; index <= 4; index++ ) {
+            const endpoint = device.getEndpoint(index);
             await bind(endpoint, coordinatorEndpoint, ['genOnOff', 'seMetering']);
 
             await endpoint.configureReporting('genOnOff', [{

@@ -38,7 +38,7 @@ const uint8  zclWaterControl_ApplicationVersion  = 4;
 const uint8  zclWaterControl_StackVersion        = 4;
 
 const uint8  zclWaterControl_ManufacturerName[]  = { 6, 'T','e','a','m','4','2' };
-const uint8  zclWaterControl_ModelId[]           = { 4, 'W','C','0','4' };
+const uint8  zclWaterControl_ModelId[]           = { 4, 'I','C','0','4' };
 const uint8  zclWaterControl_PowerSource         = POWER_SOURCE_MAINS_1_PHASE;
 
 const uint8  zclWaterControl_MeteringDeviceType  = 2;  // Water Metering see https://zigbeealliance.org/wp-content/uploads/2019/12/07-5123-06-zigbee-cluster-library-specification.pdf
