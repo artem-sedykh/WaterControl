@@ -23,8 +23,9 @@ P1_2 - C1 RELAY
 P1_3 - C2 RELAY  
 P1_6 - C3 RELAY  
 P1_7 - C4 RELAY  
+
 ---------------------------------
-ROUTER CONFIG
+ROUTER CONFIG  
 P1_4 - Green led  
 
 P2_0 - Main button  
