@@ -93,6 +93,14 @@
 #define RELAY2_SBIT         P1_3
 #define RELAY2_DDR          P1DIR
 
+#define RELAY3_BV           BV(6)
+#define RELAY3_SBIT         P1_6
+#define RELAY3_DDR          P1DIR
+
+#define RELAY4_BV           BV(7)
+#define RELAY4_SBIT         P1_7
+#define RELAY4_DDR          P1DIR
+
 /* ------------------------------------------------------------------------------------------------
  *                                    Push Button Configuration
  * ------------------------------------------------------------------------------------------------
@@ -204,6 +212,9 @@ extern void MAC_RfFrontendSetup(void);
                                                                  \
   RELAY1_DDR |= RELAY1_BV;                                       \
   RELAY2_DDR |= RELAY2_BV;                                       \
+                                                                 \
+  RELAY3_DDR |= RELAY3_BV;                                       \
+  RELAY4_DDR |= RELAY4_BV;                                       \
 }
 
 #elif defined (HAL_PA_LNA)
@@ -239,6 +250,9 @@ extern void MAC_RfFrontendSetup(void);
                                                                  \
   RELAY1_DDR |= RELAY1_BV;                                       \
   RELAY2_DDR |= RELAY2_BV;                                       \
+                                                                 \
+  RELAY3_DDR |= RELAY3_BV;                                       \
+  RELAY4_DDR |= RELAY4_BV;                                       \
 }
 
 #elif defined (HAL_PA_LNA_CC2592) || defined (HAL_PA_LNA_SE2431L)
@@ -274,6 +288,9 @@ extern void MAC_RfFrontendSetup(void);
                                                                  \
   RELAY1_DDR |= RELAY1_BV;                                       \
   RELAY2_DDR |= RELAY2_BV;                                       \
+                                                                 \
+  RELAY3_DDR |= RELAY3_BV;                                       \
+  RELAY4_DDR |= RELAY4_BV;                                       \
 }
 #endif
 
@@ -292,6 +309,8 @@ extern void MAC_RfFrontendSetup(void);
 
 #define HAL_APPLY_RELAY0(STATE)   st( RELAY1_SBIT = RELAY_POLARITY (STATE); )
 #define HAL_APPLY_RELAY1(STATE)   st( RELAY2_SBIT = RELAY_POLARITY (STATE); )
+#define HAL_APPLY_RELAY2(STATE)   st( RELAY3_SBIT = RELAY_POLARITY (STATE); )
+#define HAL_APPLY_RELAY3(STATE)   st( RELAY4_SBIT = RELAY_POLARITY (STATE); )
 
 
 /* ----------- LED's ---------- */

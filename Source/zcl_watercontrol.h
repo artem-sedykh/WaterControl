@@ -14,13 +14,16 @@ extern "C"
 /*********************************************************************
  * CONSTANTS
  */
-#define ENDPOINTS_COUNT       2
+#define ENDPOINTS_COUNT       4
 #define ENDPOINT_ATTRS_COUNT  18 
 #define APP_REPORT_DELAY     ((uint32)5 * (uint32)1000) // 5 sec
 #define APP_SAVE_ATTRS_DELAY ((uint32)600 * (uint32)1000) // 10 minute
 
-#define NW_HOT_CONFIG                   0x0402
-#define NW_COLD_CONFIG                  0x0412
+#define NW_C1_CONFIG                    0x0402
+#define NW_C2_CONFIG                    0x0412
+  
+#define NW_C3_CONFIG                    0x0502
+#define NW_C4_CONFIG                    0x0512
 
    
 // Application Events

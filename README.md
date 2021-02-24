@@ -58,15 +58,18 @@ P2_0 - MAIN BUTTON
 P0_0 - COLD   COUNTER
 P0_1 - HOT    COUNTER
 
-P0_2 - OTHER  COUNTER
-P0_3 - OTHER  COUNTER
+P0_2 - C1  COUNTER
+P0_4 - C2  COUNTER
 
 D3(LED) - Green; P1_4
 
 P1_2 - RELAY COLD
 P1_3 - RELAY HOT
 
+P1_6 - RELAY C1
+P1_7 - RELAY C2
+
 free ports
   0     1    2     3     4      5    6     7  
-                              P1_5  P1_6  P1_7  
+                              P1_5  
                         P0_4  P0_5  P0_6  

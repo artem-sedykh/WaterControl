@@ -26,6 +26,8 @@
 */
 DECLARE_APPLY_RELAY(0)
 DECLARE_APPLY_RELAY(1)
+DECLARE_APPLY_RELAY(2)
+DECLARE_APPLY_RELAY(3)
 
 // Global attributes
 const uint16 zclWaterControl_clusterRevision_all = 0x0001; 
@@ -36,7 +38,7 @@ const uint8  zclWaterControl_ApplicationVersion  = 4;
 const uint8  zclWaterControl_StackVersion        = 4;
 
 const uint8  zclWaterControl_ManufacturerName[]  = { 6, 'T','e','a','m','4','2' };
-const uint8  zclWaterControl_ModelId[]           = { 4, 'W','C','0','3' };
+const uint8  zclWaterControl_ModelId[]           = { 4, 'W','C','0','4' };
 const uint8  zclWaterControl_PowerSource         = POWER_SOURCE_MAINS_1_PHASE;
 
 const uint8  zclWaterControl_MeteringDeviceType  = 2;  // Water Metering see https://zigbeealliance.org/wp-content/uploads/2019/12/07-5123-06-zigbee-cluster-library-specification.pdf
@@ -45,13 +47,16 @@ const uint8  zclWaterControl_UnitofMeasure       = 1;  //m3 (Cubic Meter) & m3/h
 const uint8  zcl_EndpointsCount                  = ENDPOINTS_COUNT;
 
 app_config_t zcl_Configs[ENDPOINTS_COUNT] = {
-  { { {0, 0, 0, 0, 0, 0}, DEFAULT_DIVISOR, DEFAULT_MULTIPLIER, DEFAULT_STATUS, DEFAULT_SUMM_FORMATTING, DEFAULT_RELAY_STATE }, FALSE, NW_HOT_CONFIG , 1, TRUE, GET_FUNC(ApplyRelay, 0), { HAL_HOT_COUNTER_PORT_NUMBER , HAL_HOT_COUNTER_PIN_NUMBER  } },
-  { { {0, 0, 0, 0, 0, 0}, DEFAULT_DIVISOR, DEFAULT_MULTIPLIER, DEFAULT_STATUS, DEFAULT_SUMM_FORMATTING, DEFAULT_RELAY_STATE }, FALSE, NW_COLD_CONFIG, 2, TRUE, GET_FUNC(ApplyRelay, 1), { HAL_COLD_COUNTER_PORT_NUMBER, HAL_COLD_COUNTER_PIN_NUMBER } }
+  { { {0, 0, 0, 0, 0, 0}, DEFAULT_DIVISOR, DEFAULT_MULTIPLIER, DEFAULT_STATUS, DEFAULT_SUMM_FORMATTING, DEFAULT_RELAY_STATE }, FALSE, NW_C1_CONFIG, 1, TRUE, GET_FUNC(ApplyRelay, 0), { HAL_C1_PORT_NUMBER, HAL_C1_PIN_NUMBER } },
+  { { {0, 0, 0, 0, 0, 0}, DEFAULT_DIVISOR, DEFAULT_MULTIPLIER, DEFAULT_STATUS, DEFAULT_SUMM_FORMATTING, DEFAULT_RELAY_STATE }, FALSE, NW_C2_CONFIG, 2, TRUE, GET_FUNC(ApplyRelay, 1), { HAL_C2_PORT_NUMBER, HAL_C2_PIN_NUMBER } },
+  
+  { { {0, 0, 0, 0, 0, 0}, DEFAULT_DIVISOR, DEFAULT_MULTIPLIER, DEFAULT_STATUS, DEFAULT_SUMM_FORMATTING, DEFAULT_RELAY_STATE }, FALSE, NW_C3_CONFIG, 3, TRUE, GET_FUNC(ApplyRelay, 2), { HAL_C3_PORT_NUMBER, HAL_C3_PIN_NUMBER } },
+  { { {0, 0, 0, 0, 0, 0}, DEFAULT_DIVISOR, DEFAULT_MULTIPLIER, DEFAULT_STATUS, DEFAULT_SUMM_FORMATTING, DEFAULT_RELAY_STATE }, FALSE, NW_C4_CONFIG, 4, TRUE, GET_FUNC(ApplyRelay, 3), { HAL_C4_PORT_NUMBER, HAL_C4_PIN_NUMBER } }
 };
 
 const cId_t zclEndpoint_InClusterList[]                       = { CID_BASIC, CID_GROUPS, CID_ON_OFF };
 const cId_t zclEndpoint_OutClusterList[]                      = { CID_METERING };
-CONST zclAttrRec_t zclEndpoints_Attrs[][ENDPOINT_ATTRS_COUNT] = { ZCL_ENDPOINT_ATTRS(0), ZCL_ENDPOINT_ATTRS(1) };
+CONST zclAttrRec_t zclEndpoints_Attrs[][ENDPOINT_ATTRS_COUNT] = { ZCL_ENDPOINT_ATTRS(0), ZCL_ENDPOINT_ATTRS(1), ZCL_ENDPOINT_ATTRS(2), ZCL_ENDPOINT_ATTRS(3) };
 
 #define APP_MAX_INCLUSTERS   (sizeof(zclEndpoint_InClusterList) / sizeof(zclEndpoint_InClusterList[0]))
 #define APP_MAX_OUTCLUSTERS  (sizeof(zclEndpoint_OutClusterList) / sizeof(zclEndpoint_OutClusterList[0]))

@@ -35,7 +35,6 @@ const bind = async (endpoint, target, clusters) => {
 };
 
 const ACCESS_STATE = 0b001;
-// const ACCESS_WRITE = 0b010;
 const ACCESS_READ = 0b100;
 
 const tz = {
@@ -148,21 +147,20 @@ const fz = {
 };
 
 const device = {
-    zigbeeModel: ['WC03'],
-    model: 'WC03',
+    zigbeeModel: ['WC04'],
+    model: 'WC04',
     vendor: 'Team42',
     description: '[TODO write description)',
     supports: '',
     fromZigbee: [fromZigbeeConverters.on_off, fz.metering],
     toZigbee: [toZigbeeConverters.on_off, tz.metering],
     endpoint: (device) => {
-        return {'heat': 1, 'cool': 2};
+        return {'l1': 1, 'l2': 2, 'l3': 3, 'l4': 4};
     },
     meta: {configureKey: 1, multiEndpoint: true},
     configure: async (device, coordinatorEndpoint) => {
-        const endpoints = [device.getEndpoint(1), device.getEndpoint(2)];
-
-        for (const endpoint of endpoints) {
+        for (let i = 0; i < 4; ++i ) {
+            const endpoint = device.getEndpoint(i+1);
             await bind(endpoint, coordinatorEndpoint, ['genOnOff', 'seMetering']);
 
             await endpoint.configureReporting('genOnOff', [{
@@ -181,17 +179,29 @@ const device = {
         }
     },
     exposes: [
-        exposes.switch().withState('state', true).withEndpoint('heat'),
-        exposes.numeric('currentSummDelivered', ACCESS_STATE | ACCESS_READ).withEndpoint('heat'),
-        exposes.text('unitOfMeasure', ACCESS_STATE).withEndpoint('heat'),
-        exposes.numeric('multiplier', ACCESS_STATE | ACCESS_READ).withEndpoint('heat'),
-        exposes.numeric('divisor', ACCESS_STATE | ACCESS_READ).withEndpoint('heat'),
+        exposes.switch().withState('state', true).withEndpoint('l1'),
+        exposes.numeric('currentSummDelivered', ACCESS_STATE | ACCESS_READ).withEndpoint('l1'),
+        exposes.text('unitOfMeasure', ACCESS_STATE).withEndpoint('l1'),
+        exposes.numeric('multiplier', ACCESS_STATE | ACCESS_READ).withEndpoint('l1'),
+        exposes.numeric('divisor', ACCESS_STATE | ACCESS_READ).withEndpoint('l1'),
 
-        exposes.switch().withState('state', true).withEndpoint('cool'),
-        exposes.text('unitOfMeasure', ACCESS_STATE).withEndpoint('cool'),
-        exposes.numeric('currentSummDelivered', ACCESS_STATE | ACCESS_READ).withEndpoint('cool'),
-        exposes.numeric('multiplier', ACCESS_STATE | ACCESS_READ).withEndpoint('cool'),
-        exposes.numeric('divisor', ACCESS_STATE | ACCESS_READ).withEndpoint('cool'),
+        exposes.switch().withState('state', true).withEndpoint('l2'),
+        exposes.text('unitOfMeasure', ACCESS_STATE).withEndpoint('l2'),
+        exposes.numeric('currentSummDelivered', ACCESS_STATE | ACCESS_READ).withEndpoint('l2'),
+        exposes.numeric('multiplier', ACCESS_STATE | ACCESS_READ).withEndpoint('l2'),
+        exposes.numeric('divisor', ACCESS_STATE | ACCESS_READ).withEndpoint('l2'),
+
+        exposes.switch().withState('state', true).withEndpoint('l3'),
+        exposes.text('unitOfMeasure', ACCESS_STATE).withEndpoint('l3'),
+        exposes.numeric('currentSummDelivered', ACCESS_STATE | ACCESS_READ).withEndpoint('l3'),
+        exposes.numeric('multiplier', ACCESS_STATE | ACCESS_READ).withEndpoint('l3'),
+        exposes.numeric('divisor', ACCESS_STATE | ACCESS_READ).withEndpoint('l3'),
+
+        exposes.switch().withState('state', true).withEndpoint('l4'),
+        exposes.text('unitOfMeasure', ACCESS_STATE).withEndpoint('l4'),
+        exposes.numeric('currentSummDelivered', ACCESS_STATE | ACCESS_READ).withEndpoint('l4'),
+        exposes.numeric('multiplier', ACCESS_STATE | ACCESS_READ).withEndpoint('l4'),
+        exposes.numeric('divisor', ACCESS_STATE | ACCESS_READ).withEndpoint('l4'),
     ],
 };
 

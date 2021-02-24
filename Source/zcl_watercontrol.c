@@ -79,13 +79,19 @@ static void      zclWaterControl_HandleCounters    ( uint8 port, uint8 pin );
 
 DECLARE_BASIC_RESETCB(0) //zclWaterControl_BasicResetCB_EP0
 DECLARE_BASIC_RESETCB(1) //zclWaterControl_BasicResetCB_EP1
+DECLARE_BASIC_RESETCB(2) //zclWaterControl_BasicResetCB_EP2
+DECLARE_BASIC_RESETCB(3) //zclWaterControl_BasicResetCB_EP3
 
 DECLARE_ON_OFFCB(0)      //zclWaterControl_OnOffCB_EP0
 DECLARE_ON_OFFCB(1)      //zclWaterControl_OnOffCB_EP1
+DECLARE_ON_OFFCB(2)      //zclWaterControl_OnOffCB_EP2
+DECLARE_ON_OFFCB(3)      //zclWaterControl_OnOffCB_EP3
 
 static zclGeneral_AppCallbacks_t zclEndpoint_CmdCallbacks[ENDPOINTS_COUNT]  = {
   { GET_FUNC(zclWaterControl_BasicResetCB, 0), NULL, GET_FUNC(zclWaterControl_OnOffCB, 0), NULL, NULL, NULL, NULL, NULL },
   { GET_FUNC(zclWaterControl_BasicResetCB, 1), NULL, GET_FUNC(zclWaterControl_OnOffCB, 1), NULL, NULL, NULL, NULL, NULL },
+  { GET_FUNC(zclWaterControl_BasicResetCB, 2), NULL, GET_FUNC(zclWaterControl_OnOffCB, 2), NULL, NULL, NULL, NULL, NULL },
+  { GET_FUNC(zclWaterControl_BasicResetCB, 3), NULL, GET_FUNC(zclWaterControl_OnOffCB, 3), NULL, NULL, NULL, NULL, NULL },
 };
 
 void zclWaterControl_Init ( byte task_id ) {
@@ -278,7 +284,7 @@ static void zclWaterControl_SaveAttributes ( void ) {
 
     uint8 writeStatus = osal_nv_write ( nvId, 0, sizeof(endpoint_config_t), config );
   
-    LREP ( "[ep%d SaveAttributes] zclHot_Config status: %d \r\n", endpoint, writeStatus );
+    LREP ( "[ep%d SaveAttributes] status: %d \r\n", endpoint, writeStatus );
 
     if ( writeStatus == SUCCESS ) {
         zcl_Configs[i].Changed = FALSE;
