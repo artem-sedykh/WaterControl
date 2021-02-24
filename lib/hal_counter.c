@@ -66,7 +66,7 @@ static uint8 registeredCountersTaskID = NO_TASK_ID;
  **************************************************************************************************/
 void halProcessCounterInterrupt ( uint8 portNum );
 
-uint8 counter_state_send ( uint8 portNumber, uint8 pinNumber, bool state );
+uint8 counter_state_send ( uint8 portNumber, uint8 pinNumber );
 
 void zclCounter_Init ( uint8 task_id ) {
   TaskID = task_id;
@@ -188,8 +188,6 @@ void halProcessCounterInterrupt ( uint8 portNumber ) {
 }
 
 uint16 zclCounter_event_loop ( uint8 task_id, UINT16 events ) {
-  uint8 PINS_EDGE;
-  uint8 PN;
   uint8 enabledPins;
   uint8 portsNumber = (events >> 8);
   LREP("[zclCounter_event_loop]: events: %d\r\n", events);
@@ -203,18 +201,12 @@ uint16 zclCounter_event_loop ( uint8 task_id, UINT16 events ) {
       switch ( portIndex ) {
         case 0:
           enabledPins = HAL_COUNTER_P0_INPUT_PINS;
-          PINS_EDGE = HAL_COUNTER_P0_INPUT_PINS_EDGE;
-          PN = P0;
           break;
         case 1:
           enabledPins = HAL_COUNTER_P1_INPUT_PINS;
-          PINS_EDGE = HAL_COUNTER_P1_INPUT_PINS_EDGE;
-          PN = P1;
           break;
         case 2:
           enabledPins = HAL_COUNTER_P2_INPUT_PINS;
-          PINS_EDGE = HAL_COUNTER_P2_INPUT_PINS_EDGE;
-          PN = P2;
           break;
         default:
           continue;
@@ -223,8 +215,7 @@ uint16 zclCounter_event_loop ( uint8 task_id, UINT16 events ) {
       for (uint8 pinIndex = 0; pinIndex < 8; pinIndex++) {
         uint8 pinNumber = 1 << pinIndex;
         if ( (enabledPins & pinNumber) && (pinsNumber & pinNumber) ) {
-          bool isPressed = PINS_EDGE != !!(PN & pinNumber);
-          counter_state_send ( portIndex, pinIndex, isPressed );
+          counter_state_send ( portIndex, pinIndex );
         }
       }
     }
@@ -233,7 +224,7 @@ uint16 zclCounter_event_loop ( uint8 task_id, UINT16 events ) {
   return 0;
 }
 
-uint8 counter_state_send ( uint8 port, uint8 pin, bool state ) { 
+uint8 counter_state_send ( uint8 port, uint8 pin ) { 
   if ( registeredCountersTaskID == NO_TASK_ID ) {
     return ( ZFailure );
   }
@@ -244,7 +235,6 @@ uint8 counter_state_send ( uint8 port, uint8 pin, bool state ) {
   if ( msgPtr )
   {
     msgPtr->hdr.event = COUNTER_CHANGE;
-    msgPtr->state = state;
     msgPtr->port = port;
     msgPtr->pin = pin;
 

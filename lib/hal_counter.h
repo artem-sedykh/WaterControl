@@ -43,7 +43,6 @@ extern "C"
 typedef struct
 {
   osal_event_hdr_t hdr;
-  bool state;
   uint8 port; 
   uint8 pin;
 } counterChange_t;

@@ -75,7 +75,7 @@ static void      zclWaterControl_Increment         ( app_config_t *config );
 static void      zclWaterControl_Report            ( void );
 
 static void      zclWaterControl_HandleKeys        ( byte portAndAction, byte keyCode );
-static void      zclWaterControl_HandleCounters    ( uint8 port, uint8 pin, bool state );
+static void      zclWaterControl_HandleCounters    ( uint8 port, uint8 pin );
 
 DECLARE_BASIC_RESETCB(0) //zclWaterControl_BasicResetCB_EP0
 DECLARE_BASIC_RESETCB(1) //zclWaterControl_BasicResetCB_EP1
@@ -132,7 +132,7 @@ uint16 zclWaterControl_event_loop ( uint8 task_id, uint16 events ) {
       LREP("MSGpkt->hdr.event 0x%X clusterId=0x%X\r\n", MSGpkt->hdr.event, MSGpkt->clusterId);
       switch (MSGpkt->hdr.event) {
         case COUNTER_CHANGE:
-          zclWaterControl_HandleCounters ( ((counterChange_t *)MSGpkt)->port,  ((counterChange_t *)MSGpkt)->pin, ((counterChange_t *)MSGpkt)->state );
+          zclWaterControl_HandleCounters ( ((counterChange_t *)MSGpkt)->port,  ((counterChange_t *)MSGpkt)->pin );
           break;
         case KEY_CHANGE:
           zclWaterControl_HandleKeys ( ((keyChange_t *)MSGpkt)->state, ((keyChange_t *)MSGpkt)->keys );
@@ -172,7 +172,7 @@ uint16 zclWaterControl_event_loop ( uint8 task_id, uint16 events ) {
   return 0;
 }
 
-static void zclWaterControl_HandleCounters ( uint8 port, uint8 pin, bool state ) {
+static void zclWaterControl_HandleCounters ( uint8 port, uint8 pin ) {
   LREP("[zclWaterControl_HandleCounters]: port: P%d_%d\r\n", port, pin);
 
   for ( uint8 i = 0; i < zcl_EndpointsCount; i++ ) {
